@@ -196,7 +196,8 @@ export default function PayrollPage() {
   };
 
   return (
-    <div className="p-6">
+    <DashboardLayout>
+      <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">مسير الرواتب الشهرية</h1>
         <Dialog open={open} onOpenChange={handleDialogClose}>
@@ -410,6 +411,7 @@ export default function PayrollPage() {
         )}
       </Card>
     </div>
+    </DashboardLayout>
   );
 }
 

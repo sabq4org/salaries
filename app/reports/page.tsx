@@ -187,7 +187,8 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
   const stats = calculateStats();
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl" dir="rtl">
+    <DashboardLayout>
+      <div className="container mx-auto p-6 max-w-7xl" dir="rtl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">التقارير</h1>
         <Button onClick={generateReport} className="gap-2">
@@ -450,6 +451,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
         </div>
       </Card>
     </div>
+    </DashboardLayout>
   );
 }
 
