@@ -12,13 +12,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck, Shield } from "lucide-react";
+import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck, Shield, FileDown, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
+import { exportPayrollToPDF } from "@/lib/exportPDF";
+import { exportPayrollToExcel } from "@/lib/exportExcel";
 
 interface EmployeePayroll {
   id: number;
   employeeId: number;
   employeeName?: string;
+  position?: string;
   year: number;
   month: number;
   baseSalary: number;
@@ -32,6 +35,7 @@ interface ContractorPayroll {
   id: number;
   contractorId: number;
   contractorName?: string;
+  position?: string;
   year: number;
   month: number;
   salary: number;
@@ -43,6 +47,7 @@ interface ContractorPayroll {
 interface Employee {
   id: number;
   name: string;
+  position?: string;
   baseSalary: number;
   socialInsurance: number;
 }
@@ -50,6 +55,7 @@ interface Employee {
 interface Contractor {
   id: number;
   name: string;
+  position?: string;
   salary: number;
 }
 
@@ -105,16 +111,28 @@ export default function PayrollPage() {
       // Fetch employee payrolls
       const empPayRes = await fetch(`/api/payroll?year=${selectedYear}&month=${selectedMonth}`);
       const empPayData = await empPayRes.json();
-      const enrichedEmpPay = empPayData.map((p: any) => ({
-        ...p,
-        employeeName: empData.find((e: Employee) => e.id === p.employeeId)?.name || 'غير معروف',
-      }));
+      const enrichedEmpPay = empPayData.map((p: any) => {
+        const emp = empData.find((e: Employee) => e.id === p.employeeId);
+        return {
+          ...p,
+          employeeName: emp?.name || 'غير معروف',
+          position: emp?.position || '-',
+        };
+      });
       setEmployeePayrolls(enrichedEmpPay);
 
       // Fetch contractor payrolls
       const conPayRes = await fetch(`/api/contractor-payroll?year=${selectedYear}&month=${selectedMonth}`);
       const conPayData = await conPayRes.json();
-      setContractorPayrolls(conPayData);
+      const enrichedConPay = conPayData.map((p: any) => {
+        const con = conData.find((c: Contractor) => c.id === p.contractorId);
+        return {
+          ...p,
+          contractorName: con?.name || 'غير معروف',
+          position: con?.position || '-',
+        };
+      });
+      setContractorPayrolls(enrichedConPay);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('فشل في تحميل البيانات');
@@ -207,6 +225,46 @@ export default function PayrollPage() {
     }
   };
 
+  const handleExportPDF = () => {
+    try {
+      const data = {
+        employeePayrolls,
+        contractorPayrolls,
+        year: selectedYear,
+        month: selectedMonth,
+        totalEmployeeSalaries,
+        totalContractorSalaries,
+        totalSocialInsurance,
+        grandTotal,
+      };
+      exportPayrollToPDF(data);
+      toast.success('تم تصدير المسير إلى PDF بنجاح');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast.error('فشل في تصدير PDF');
+    }
+  };
+
+  const handleExportExcel = () => {
+    try {
+      const data = {
+        employeePayrolls,
+        contractorPayrolls,
+        year: selectedYear,
+        month: selectedMonth,
+        totalEmployeeSalaries,
+        totalContractorSalaries,
+        totalSocialInsurance,
+        grandTotal,
+      };
+      exportPayrollToExcel(data);
+      toast.success('تم تصدير المسير إلى Excel بنجاح');
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      toast.error('فشل في تصدير Excel');
+    }
+  };
+
   const totalEmployeeSalaries = employeePayrolls.reduce((sum, p) => sum + p.netSalary, 0);
   const totalContractorSalaries = contractorPayrolls.reduce((sum, p) => sum + p.netSalary, 0);
   const totalSocialInsurance = employeePayrolls.reduce((sum, p) => sum + p.socialInsurance, 0);
@@ -221,9 +279,31 @@ export default function PayrollPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">مسير الرواتب الشهرية</h1>
-          <p className="text-gray-600 mt-2">إدارة رواتب الموظفين والمتعاونين</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">مسير الرواتب الشهرية</h1>
+            <p className="text-gray-600 mt-2">إدارة رواتب الموظفين والمتعاونين</p>
+          </div>
+          
+          {/* Export Buttons */}
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleExportPDF}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={employeePayrolls.length === 0 && contractorPayrolls.length === 0}
+            >
+              <FileDown className="w-4 h-4 ml-2" />
+              تصدير PDF
+            </Button>
+            <Button 
+              onClick={handleExportExcel}
+              className="bg-green-600 hover:bg-green-700"
+              disabled={employeePayrolls.length === 0 && contractorPayrolls.length === 0}
+            >
+              <FileSpreadsheet className="w-4 h-4 ml-2" />
+              تصدير Excel
+            </Button>
+          </div>
         </div>
 
         {/* Month/Year Selector */}
@@ -416,6 +496,7 @@ export default function PayrollPage() {
                 <thead>
                   <tr style={{ backgroundColor: '#f8f8f7' }}>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الموظف</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المنصب</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب الأساسي</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">التأمينات</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الخصومات</th>
@@ -428,6 +509,7 @@ export default function PayrollPage() {
                   {employeePayrolls.map((payroll) => (
                     <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.employeeName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{payroll.position}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.baseSalary.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.socialInsurance.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
@@ -555,6 +637,7 @@ export default function PayrollPage() {
                 <thead>
                   <tr style={{ backgroundColor: '#f8f8f7' }}>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المتعاون</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المنصب</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الخصومات</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المكافآت</th>
@@ -566,6 +649,7 @@ export default function PayrollPage() {
                   {contractorPayrolls.map((payroll) => (
                     <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.contractorName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{payroll.position}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.salary.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{payroll.bonus.toLocaleString()} ر.س</td>
