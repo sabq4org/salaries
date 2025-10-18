@@ -11,7 +11,7 @@ export const db = drizzle(client, { schema });
 
 // Employees
 export async function getAllEmployees() {
-  return await db.select().from(employees).where(eq(employees.isActive, true));
+  return await db.select().from(employees).where(eq(employees.isActive, true)).orderBy(employees.sortOrder);
 }
 
 export async function createEmployee(data: typeof employees.$inferInsert) {
@@ -34,7 +34,7 @@ export async function deleteEmployee(id: number) {
 
 // Contractors
 export async function getAllContractors() {
-  return await db.select().from(contractors).where(eq(contractors.isActive, true));
+  return await db.select().from(contractors).where(eq(contractors.isActive, true)).orderBy(contractors.sortOrder);
 }
 
 export async function createContractor(data: typeof contractors.$inferInsert) {

@@ -12,64 +12,40 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, Users, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { SortableRow } from './SortableRow';
 
-interface Employee {
+interface Contractor {
   id: number;
   name: string;
   position: string | null;
-  baseSalary: number;
-  socialInsurance: number;
-  sortOrder: number;
+  salary: number;
+  // No social insurance for contractors
   isActive: boolean;
 }
 
-export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+export default function ContractorsPage() {
+  const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     position: "",
-    baseSalary: 0,
-    socialInsurance: 0,
+    salary: 0,
+    
   });
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
   useEffect(() => {
-    fetchEmployees();
+    fetchContractors();
   }, []);
 
-  const fetchEmployees = async () => {
+  const fetchContractors = async () => {
     try {
-      const response = await fetch('/api/employees');
-      if (!response.ok) throw new Error('Failed to fetch employees');
+      const response = await fetch('/api/contractors');
+      if (!response.ok) throw new Error('Failed to fetch contractors');
       const data = await response.json();
-      setEmployees(data);
+      setContractors(data);
     } catch (error) {
       console.error('Error:', error);
       toast.error('فشل في تحميل البيانات');
@@ -78,43 +54,10 @@ export default function EmployeesPage() {
     }
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = employees.findIndex((e) => e.id === active.id);
-      const newIndex = employees.findIndex((e) => e.id === over.id);
-
-      const newEmployees = arrayMove(employees, oldIndex, newIndex);
-      setEmployees(newEmployees);
-
-      // Update sortOrder for all employees
-      const updates = newEmployees.map((emp, index) => ({
-        id: emp.id,
-        sortOrder: index,
-      }));
-
-      try {
-        const response = await fetch('/api/employees/reorder', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: updates }),
-        });
-
-        if (!response.ok) throw new Error('Failed to reorder employees');
-        toast.success('تم تحديث الترتيب بنجاح');
-      } catch (error) {
-        console.error('Error:', error);
-        toast.error('فشل في حفظ الترتيب');
-        fetchEmployees(); // Revert on error
-      }
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingId ? `/api/employees?id=${editingId}` : '/api/employees';
+      const url = editingId ? `/api/contractors?id=${editingId}` : '/api/contractors';
       const method = editingId ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
@@ -123,42 +66,40 @@ export default function EmployeesPage() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} employee`);
+      if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} contractor`);
       
-      toast.success(editingId ? 'تم تحديث الموظف بنجاح' : 'تم إضافة الموظف بنجاح');
+      toast.success(editingId ? 'تم تحديث المتعاون بنجاح' : 'تم إضافة المتعاون بنجاح');
       setOpen(false);
       setEditingId(null);
-      setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
-      fetchEmployees();
+      fetchContractors();
     } catch (error) {
       console.error('Error:', error);
-      toast.error(editingId ? 'فشل في تحديث الموظف' : 'فشل في إضافة الموظف');
+      toast.error(editingId ? 'فشل في تحديث المتعاون' : 'فشل في إضافة المتعاون');
     }
   };
 
-  const handleEdit = (employee: Employee) => {
-    setEditingId(employee.id);
+  const handleEdit = (contractor: Contractor) => {
+    setEditingId(contractor.id);
     setFormData({
-      name: employee.name,
-      position: employee.position || "",
-      baseSalary: employee.baseSalary,
-      socialInsurance: employee.socialInsurance,
+      name: contractor.name,
+      position: contractor.position || "",
+      salary: contractor.salary,
     });
     setOpen(true);
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
+    if (!confirm('هل أنت متأكد من حذف هذا المتعاون؟')) return;
     
     try {
-      const response = await fetch(`/api/employees?id=${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete employee');
+      const response = await fetch(`/api/contractors?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete contractor');
       
-      toast.success('تم حذف الموظف بنجاح');
-      fetchEmployees();
+      toast.success('تم حذف المتعاون بنجاح');
+      fetchContractors();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('فشل في حذف الموظف');
+      toast.error('فشل في حذف المتعاون');
     }
   };
 
@@ -181,10 +122,10 @@ export default function EmployeesPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            الموظفون الرسميون
+            المتعاونون
           </h1>
           <p className="text-gray-600">
-            إدارة بيانات الموظفين والرواتب والتأمينات الاجتماعية
+            إدارة بيانات المتعاونين والمستقلين
           </p>
         </div>
 
@@ -193,19 +134,18 @@ export default function EmployeesPage() {
             <Button 
               onClick={() => {
                 setEditingId(null);
-                setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
               }}
               style={{ backgroundColor: '#2563eb' }}
               className="text-white hover:opacity-90"
             >
               <Plus className="ml-2 h-4 w-4" />
-              إضافة موظف جديد
+              إضافة متعاون جديد
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: '#ffffff' }}>
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">
-                {editingId ? 'تعديل موظف' : 'إضافة موظف جديد'}
+                {editingId ? 'تعديل متعاون' : 'إضافة متعاون جديد'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -229,23 +169,19 @@ export default function EmployeesPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="baseSalary">الراتب الأساسي (ر.س)</Label>
+                <Label htmlFor="salary">الراتب الشهري (ر.س)</Label>
                 <Input
-                  id="baseSalary"
+                  id="salary"
                   type="number"
-                  value={formData.baseSalary}
-                  onChange={(e) => setFormData({ ...formData, baseSalary: parseInt(e.target.value) || 0 })}
+                  value={formData.salary}
+                  onChange={(e) => setFormData({ ...formData, salary: parseInt(e.target.value) || 0 })}
                   required
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="socialInsurance">التأمينات الاجتماعية (ر.س)</Label>
                 <Input
-                  id="socialInsurance"
                   type="number"
-                  value={formData.socialInsurance}
-                  onChange={(e) => setFormData({ ...formData, socialInsurance: parseInt(e.target.value) || 0 })}
                   required
                   className="mt-1"
                 />
@@ -271,8 +207,8 @@ export default function EmployeesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي الموظفين</p>
-              <p className="text-3xl font-bold text-gray-900">{employees.length}</p>
+              <p className="text-sm text-gray-600 mb-1">إجمالي المتعاونين</p>
+              <p className="text-3xl font-bold text-gray-900">{contractors.length}</p>
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -291,7 +227,7 @@ export default function EmployeesPage() {
             <div>
               <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
               <p className="text-3xl font-bold text-gray-900">
-                {employees.reduce((sum, e) => sum + e.baseSalary, 0).toLocaleString()} ر.س
+                {contractors.reduce((sum, e) => sum + e.salary, 0).toLocaleString()} ر.س
               </p>
             </div>
           </div>
@@ -303,9 +239,9 @@ export default function EmployeesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي التأمينات</p>
+              <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
               <p className="text-3xl font-bold text-gray-900">
-                {employees.reduce((sum, e) => sum + e.socialInsurance, 0).toLocaleString()} ر.س
+                {contractors.reduce((sum, e) => sum + e.salary, 0).toLocaleString()} ر.س
               </p>
             </div>
           </div>
@@ -318,48 +254,61 @@ export default function EmployeesPage() {
         style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
       >
         <div className="overflow-x-auto">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+          <table className="w-full">
+            <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <tr>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الشهري</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
+                <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contractors.length === 0 ? (
                 <tr>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700 w-12"></th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
-                  <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
+                  <td colSpan={5} className="text-center p-8 text-gray-500">
+                    لا يوجد متعاونون
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {employees.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center p-8 text-gray-500">
-                      لا يوجد موظفون
+              ) : (
+                contractors.map((contractor, index) => (
+                  <tr 
+                    key={contractor.id}
+                    style={{ 
+                      borderTop: '1px solid #f0f0ef',
+                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                    }}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="p-4 text-gray-900 font-medium">{contractor.name}</td>
+                    <td className="p-4 text-gray-600">{contractor.position || '-'}</td>
+                    <td className="p-4 text-gray-900">{contractor.salary.toLocaleString()} ر.س</td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(contractor)}
+                          className="hover:bg-blue-50"
+                        >
+                          <Pencil className="h-4 w-4" style={{ color: '#2563eb' }} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(contractor.id)}
+                          className="hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" style={{ color: '#dc2626' }} />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  <SortableContext
-                    items={employees.map(e => e.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {employees.map((employee, index) => (
-                      <SortableRow
-                        key={employee.id}
-                        employee={employee}
-                        index={index}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                      />
-                    ))}
-                  </SortableContext>
-                )}
-              </tbody>
-            </table>
-          </DndContext>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </DashboardLayout>

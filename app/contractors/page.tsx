@@ -12,15 +12,31 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, GripVertical } from "lucide-react";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { SortableRow } from './SortableRow';
 
 interface Contractor {
   id: number;
   name: string;
   position: string | null;
   salary: number;
-  // No social insurance for contractors
+  sortOrder: number;
   isActive: boolean;
 }
 
@@ -33,8 +49,14 @@ export default function ContractorsPage() {
     name: "",
     position: "",
     salary: 0,
-    
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     fetchContractors();
@@ -51,6 +73,39 @@ export default function ContractorsPage() {
       toast.error('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = contractors.findIndex((c) => c.id === active.id);
+      const newIndex = contractors.findIndex((c) => c.id === over.id);
+
+      const newContractors = arrayMove(contractors, oldIndex, newIndex);
+      setContractors(newContractors);
+
+      // Update sortOrder for all contractors
+      const updates = newContractors.map((con, index) => ({
+        id: con.id,
+        sortOrder: index,
+      }));
+
+      try {
+        const response = await fetch('/api/contractors/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: updates }),
+        });
+
+        if (!response.ok) throw new Error('Failed to reorder contractors');
+        toast.success('تم تحديث الترتيب بنجاح');
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('فشل في حفظ الترتيب');
+        fetchContractors(); // Revert on error
+      }
     }
   };
 
@@ -71,6 +126,7 @@ export default function ContractorsPage() {
       toast.success(editingId ? 'تم تحديث المتعاون بنجاح' : 'تم إضافة المتعاون بنجاح');
       setOpen(false);
       setEditingId(null);
+      setFormData({ name: "", position: "", salary: 0 });
       fetchContractors();
     } catch (error) {
       console.error('Error:', error);
@@ -108,7 +164,7 @@ export default function ContractorsPage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#2563eb' }}></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#16a34a' }}></div>
             <p className="text-gray-600">جاري تحميل البيانات...</p>
           </div>
         </div>
@@ -125,7 +181,7 @@ export default function ContractorsPage() {
             المتعاونون
           </h1>
           <p className="text-gray-600">
-            إدارة بيانات المتعاونين والمستقلين
+            إدارة بيانات المتعاونين والرواتب
           </p>
         </div>
 
@@ -134,8 +190,9 @@ export default function ContractorsPage() {
             <Button 
               onClick={() => {
                 setEditingId(null);
+                setFormData({ name: "", position: "", salary: 0 });
               }}
-              style={{ backgroundColor: '#2563eb' }}
+              style={{ backgroundColor: '#16a34a' }}
               className="text-white hover:opacity-90"
             >
               <Plus className="ml-2 h-4 w-4" />
@@ -169,7 +226,7 @@ export default function ContractorsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="salary">الراتب الشهري (ر.س)</Label>
+                <Label htmlFor="salary">الراتب (ر.س)</Label>
                 <Input
                   id="salary"
                   type="number"
@@ -179,15 +236,8 @@ export default function ContractorsPage() {
                   className="mt-1"
                 />
               </div>
-              <div>
-                <Input
-                  type="number"
-                  required
-                  className="mt-1"
-                />
-              </div>
               <div className="flex gap-2 pt-4">
-                <Button type="submit" style={{ backgroundColor: '#2563eb' }} className="flex-1 text-white">
+                <Button type="submit" style={{ backgroundColor: '#16a34a' }} className="flex-1 text-white">
                   {editingId ? 'حفظ التعديلات' : 'إضافة'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
@@ -200,7 +250,7 @@ export default function ContractorsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div 
           className="p-6 rounded-xl"
           style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
@@ -212,7 +262,7 @@ export default function ContractorsPage() {
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              style={{ backgroundColor: '#dcfce7', color: '#16a34a' }}
             >
               <Users className="h-6 w-6" />
             </div>
@@ -227,21 +277,7 @@ export default function ContractorsPage() {
             <div>
               <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
               <p className="text-3xl font-bold text-gray-900">
-                {contractors.reduce((sum, e) => sum + e.salary, 0).toLocaleString()} ر.س
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div 
-          className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
-              <p className="text-3xl font-bold text-gray-900">
-                {contractors.reduce((sum, e) => sum + e.salary, 0).toLocaleString()} ر.س
+                {contractors.reduce((sum, c) => sum + c.salary, 0).toLocaleString()} ر.س
               </p>
             </div>
           </div>
@@ -254,61 +290,47 @@ export default function ContractorsPage() {
         style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
       >
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{ backgroundColor: '#f8f8f7' }}>
-              <tr>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الشهري</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
-                <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contractors.length === 0 ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f8f7' }}>
                 <tr>
-                  <td colSpan={5} className="text-center p-8 text-gray-500">
-                    لا يوجد متعاونون
-                  </td>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700 w-12"></th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب</th>
+                  <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
                 </tr>
-              ) : (
-                contractors.map((contractor, index) => (
-                  <tr 
-                    key={contractor.id}
-                    style={{ 
-                      borderTop: '1px solid #f0f0ef',
-                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
-                    }}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="p-4 text-gray-900 font-medium">{contractor.name}</td>
-                    <td className="p-4 text-gray-600">{contractor.position || '-'}</td>
-                    <td className="p-4 text-gray-900">{contractor.salary.toLocaleString()} ر.س</td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(contractor)}
-                          className="hover:bg-blue-50"
-                        >
-                          <Pencil className="h-4 w-4" style={{ color: '#2563eb' }} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(contractor.id)}
-                          className="hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" style={{ color: '#dc2626' }} />
-                        </Button>
-                      </div>
+              </thead>
+              <tbody>
+                {contractors.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center p-8 text-gray-500">
+                      لا يوجد متعاونون
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  <SortableContext
+                    items={contractors.map(c => c.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {contractors.map((contractor, index) => (
+                      <SortableRow
+                        key={contractor.id}
+                        contractor={contractor}
+                        index={index}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                      />
+                    ))}
+                  </SortableContext>
+                )}
+              </tbody>
+            </table>
+          </DndContext>
         </div>
       </div>
     </DashboardLayout>
