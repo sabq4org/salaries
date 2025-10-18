@@ -9,10 +9,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, DollarSign, Edit2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -48,6 +58,10 @@ export default function QuarterlyBudgetPage() {
   const [activeTab, setActiveTab] = useState<'expenses' | 'revenues'>('expenses');
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [revenueDialogOpen, setRevenueDialogOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'expense' | 'revenue', id: number } | null>(null);
 
   const [expenseForm, setExpenseForm] = useState({
     type: 'operational' as 'salary' | 'operational' | 'marketing' | 'other',
@@ -106,25 +120,75 @@ export default function QuarterlyBudgetPage() {
           year: selectedYear,
           month,
           quarter: selectedQuarter,
-          ...expenseForm,
+          type: expenseForm.type,
+          description: expenseForm.description,
+          amount: expenseForm.amount,
+          date: expenseForm.date,
+          notes: expenseForm.notes,
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to add expense');
-
-      toast.success('تم إضافة المصروف بنجاح');
-      setExpenseDialogOpen(false);
-      setExpenseForm({
-        type: 'operational',
-        description: '',
-        amount: 0,
-        date: new Date().toISOString().split('T')[0],
-        notes: '',
-      });
-      fetchData();
+      if (response.ok) {
+        toast.success('تم إضافة المصروف بنجاح');
+        setExpenseDialogOpen(false);
+        setExpenseForm({
+          type: 'operational',
+          description: '',
+          amount: 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: '',
+        });
+        fetchData();
+      } else {
+        toast.error('فشل في إضافة المصروف');
+      }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('فشل في إضافة المصروف');
+      console.error('Error adding expense:', error);
+      toast.error('حدث خطأ أثناء إضافة المصروف');
+    }
+  };
+
+  const handleEditExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingExpense) return;
+
+    try {
+      const date = new Date(expenseForm.date);
+      const month = date.getMonth() + 1;
+
+      const response = await fetch(`/api/expenses?id=${editingExpense.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          year: selectedYear,
+          month,
+          quarter: selectedQuarter,
+          type: expenseForm.type,
+          description: expenseForm.description,
+          amount: expenseForm.amount,
+          date: expenseForm.date,
+          notes: expenseForm.notes,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('تم تحديث المصروف بنجاح');
+        setExpenseDialogOpen(false);
+        setEditingExpense(null);
+        setExpenseForm({
+          type: 'operational',
+          description: '',
+          amount: 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: '',
+        });
+        fetchData();
+      } else {
+        toast.error('فشل في تحديث المصروف');
+      }
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      toast.error('حدث خطأ أثناء تحديث المصروف');
     }
   };
 
@@ -141,25 +205,146 @@ export default function QuarterlyBudgetPage() {
           year: selectedYear,
           month,
           quarter: selectedQuarter,
-          ...revenueForm,
+          source: revenueForm.source,
+          amount: revenueForm.amount,
+          date: revenueForm.date,
+          notes: revenueForm.notes,
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to add revenue');
-
-      toast.success('تم إضافة الإيراد بنجاح');
-      setRevenueDialogOpen(false);
-      setRevenueForm({
-        source: '',
-        amount: 0,
-        date: new Date().toISOString().split('T')[0],
-        notes: '',
-      });
-      fetchData();
+      if (response.ok) {
+        toast.success('تم إضافة الإيراد بنجاح');
+        setRevenueDialogOpen(false);
+        setRevenueForm({
+          source: '',
+          amount: 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: '',
+        });
+        fetchData();
+      } else {
+        toast.error('فشل في إضافة الإيراد');
+      }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('فشل في إضافة الإيراد');
+      console.error('Error adding revenue:', error);
+      toast.error('حدث خطأ أثناء إضافة الإيراد');
     }
+  };
+
+  const handleEditRevenue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRevenue) return;
+
+    try {
+      const date = new Date(revenueForm.date);
+      const month = date.getMonth() + 1;
+
+      const response = await fetch(`/api/revenues?id=${editingRevenue.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          year: selectedYear,
+          month,
+          quarter: selectedQuarter,
+          source: revenueForm.source,
+          amount: revenueForm.amount,
+          date: revenueForm.date,
+          notes: revenueForm.notes,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('تم تحديث الإيراد بنجاح');
+        setRevenueDialogOpen(false);
+        setEditingRevenue(null);
+        setRevenueForm({
+          source: '',
+          amount: 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: '',
+        });
+        fetchData();
+      } else {
+        toast.error('فشل في تحديث الإيراد');
+      }
+    } catch (error) {
+      console.error('Error updating revenue:', error);
+      toast.error('حدث خطأ أثناء تحديث الإيراد');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      const endpoint = itemToDelete.type === 'expense' ? '/api/expenses' : '/api/revenues';
+      const response = await fetch(`${endpoint}?id=${itemToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast.success(`تم حذف ${itemToDelete.type === 'expense' ? 'المصروف' : 'الإيراد'} بنجاح`);
+        setDeleteDialogOpen(false);
+        setItemToDelete(null);
+        fetchData();
+      } else {
+        toast.error(`فشل في حذف ${itemToDelete.type === 'expense' ? 'المصروف' : 'الإيراد'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      toast.error('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const openEditExpenseDialog = (expense: Expense) => {
+    setEditingExpense(expense);
+    setExpenseForm({
+      type: expense.type,
+      description: expense.description || '',
+      amount: expense.amount,
+      date: new Date(expense.date).toISOString().split('T')[0],
+      notes: expense.notes || '',
+    });
+    setExpenseDialogOpen(true);
+  };
+
+  const openEditRevenueDialog = (revenue: Revenue) => {
+    setEditingRevenue(revenue);
+    setRevenueForm({
+      source: revenue.source,
+      amount: revenue.amount,
+      date: new Date(revenue.date).toISOString().split('T')[0],
+      notes: revenue.notes || '',
+    });
+    setRevenueDialogOpen(true);
+  };
+
+  const openDeleteDialog = (type: 'expense' | 'revenue', id: number) => {
+    setItemToDelete({ type, id });
+    setDeleteDialogOpen(true);
+  };
+
+  const closeExpenseDialog = () => {
+    setExpenseDialogOpen(false);
+    setEditingExpense(null);
+    setExpenseForm({
+      type: 'operational',
+      description: '',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+    });
+  };
+
+  const closeRevenueDialog = () => {
+    setRevenueDialogOpen(false);
+    setEditingRevenue(null);
+    setRevenueForm({
+      source: '',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+    });
   };
 
   const quarters = [
@@ -169,34 +354,24 @@ export default function QuarterlyBudgetPage() {
     { id: 4, name: 'الربع الرابع', months: 'أكتوبر - ديسمبر' },
   ];
 
-  const typeLabels: Record<string, string> = {
+  const typeLabels = {
     salary: 'رواتب',
     operational: 'تشغيلية',
     marketing: 'تسويق',
     other: 'أخرى',
   };
 
-  const totalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0);
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalRevenues = revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
   const netBalance = totalRevenues - totalExpenses;
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-xl">جاري التحميل...</div>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
-      <div className="p-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">الميزانية الربعية</h1>
-            <p className="text-gray-600">تتبع الإيرادات والمصروفات ربع سنوياً</p>
+            <h1 className="text-3xl font-bold text-gray-900">الميزانية الربعية</h1>
+            <p className="text-gray-600 mt-1">تتبع الإيرادات والمصروفات ربع سنوياً</p>
           </div>
           <Link href="/budget/annual">
             <Button style={{ backgroundColor: '#10b981' }} className="text-white">
@@ -333,6 +508,7 @@ export default function QuarterlyBudgetPage() {
                       <th className="text-right py-3 px-4">النوع</th>
                       <th className="text-right py-3 px-4">الوصف</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
+                      <th className="text-right py-3 px-4">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -342,6 +518,26 @@ export default function QuarterlyBudgetPage() {
                         <td className="py-3 px-4">{typeLabels[expense.type]}</td>
                         <td className="py-3 px-4">{expense.description || '-'}</td>
                         <td className="py-3 px-4 font-semibold">{expense.amount.toLocaleString()} ر.س</td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openEditExpenseDialog(expense)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <Edit2 size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openDeleteDialog('expense', expense.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -359,6 +555,7 @@ export default function QuarterlyBudgetPage() {
                       <th className="text-right py-3 px-4">التاريخ</th>
                       <th className="text-right py-3 px-4">المصدر</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
+                      <th className="text-right py-3 px-4">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -367,6 +564,26 @@ export default function QuarterlyBudgetPage() {
                         <td className="py-3 px-4">{new Date(revenue.date).toLocaleDateString('ar-SA')}</td>
                         <td className="py-3 px-4">{revenue.source}</td>
                         <td className="py-3 px-4 font-semibold">{revenue.amount.toLocaleString()} ر.س</td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openEditRevenueDialog(revenue)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <Edit2 size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openDeleteDialog('revenue', revenue.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -377,118 +594,138 @@ export default function QuarterlyBudgetPage() {
             )
           )}
         </div>
-
-        {/* Expense Dialog */}
-        <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>إضافة مصروف جديد</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddExpense} className="space-y-4">
-              <div>
-                <Label>النوع</Label>
-                <select
-                  value={expenseForm.type}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value as any })}
-                  className="w-full mt-1 p-2 border rounded-md"
-                  required
-                >
-                  <option value="salary">رواتب</option>
-                  <option value="operational">تشغيلية</option>
-                  <option value="marketing">تسويق</option>
-                  <option value="other">أخرى</option>
-                </select>
-              </div>
-              <div>
-                <Label>الوصف</Label>
-                <Input
-                  value={expenseForm.description}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
-                  placeholder="وصف المصروف"
-                />
-              </div>
-              <div>
-                <Label>المبلغ (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={expenseForm.amount}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, amount: parseInt(e.target.value) || 0 })}
-                  required
-                />
-              </div>
-              <div>
-                <Label>التاريخ</Label>
-                <Input
-                  type="date"
-                  value={expenseForm.date}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label>ملاحظات</Label>
-                <Textarea
-                  value={expenseForm.notes}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, notes: e.target.value })}
-                  placeholder="ملاحظات إضافية (اختياري)"
-                />
-              </div>
-              <Button type="submit" className="w-full" style={{ backgroundColor: '#ef4444' }}>
-                إضافة
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {/* Revenue Dialog */}
-        <Dialog open={revenueDialogOpen} onOpenChange={setRevenueDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>إضافة إيراد جديد</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddRevenue} className="space-y-4">
-              <div>
-                <Label>المصدر</Label>
-                <Input
-                  value={revenueForm.source}
-                  onChange={(e) => setRevenueForm({ ...revenueForm, source: e.target.value })}
-                  placeholder="مصدر الإيراد"
-                  required
-                />
-              </div>
-              <div>
-                <Label>المبلغ (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={revenueForm.amount}
-                  onChange={(e) => setRevenueForm({ ...revenueForm, amount: parseInt(e.target.value) || 0 })}
-                  required
-                />
-              </div>
-              <div>
-                <Label>التاريخ</Label>
-                <Input
-                  type="date"
-                  value={revenueForm.date}
-                  onChange={(e) => setRevenueForm({ ...revenueForm, date: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label>ملاحظات</Label>
-                <Textarea
-                  value={revenueForm.notes}
-                  onChange={(e) => setRevenueForm({ ...revenueForm, notes: e.target.value })}
-                  placeholder="ملاحظات إضافية (اختياري)"
-                />
-              </div>
-              <Button type="submit" className="w-full" style={{ backgroundColor: '#10b981' }}>
-                إضافة
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
+
+      {/* Expense Dialog */}
+      <Dialog open={expenseDialogOpen} onOpenChange={closeExpenseDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{editingExpense ? 'تعديل مصروف' : 'إضافة مصروف جديد'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={editingExpense ? handleEditExpense : handleAddExpense} className="space-y-4">
+            <div>
+              <Label>النوع</Label>
+              <select
+                value={expenseForm.type}
+                onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value as any })}
+                className="w-full mt-1 p-2 border rounded-md"
+                required
+              >
+                <option value="salary">رواتب</option>
+                <option value="operational">تشغيلية</option>
+                <option value="marketing">تسويق</option>
+                <option value="other">أخرى</option>
+              </select>
+            </div>
+            <div>
+              <Label>الوصف</Label>
+              <Input
+                value={expenseForm.description}
+                onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
+                placeholder="وصف المصروف"
+                required
+              />
+            </div>
+            <div>
+              <Label>المبلغ (ر.س)</Label>
+              <Input
+                type="number"
+                value={expenseForm.amount}
+                onChange={(e) => setExpenseForm({ ...expenseForm, amount: parseInt(e.target.value) || 0 })}
+                required
+              />
+            </div>
+            <div>
+              <Label>التاريخ</Label>
+              <Input
+                type="date"
+                value={expenseForm.date}
+                onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label>ملاحظات</Label>
+              <Textarea
+                value={expenseForm.notes}
+                onChange={(e) => setExpenseForm({ ...expenseForm, notes: e.target.value })}
+                placeholder="ملاحظات إضافية (اختياري)"
+              />
+            </div>
+            <Button type="submit" className="w-full" style={{ backgroundColor: '#ef4444' }}>
+              {editingExpense ? 'تحديث' : 'إضافة'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revenue Dialog */}
+      <Dialog open={revenueDialogOpen} onOpenChange={closeRevenueDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{editingRevenue ? 'تعديل إيراد' : 'إضافة إيراد جديد'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={editingRevenue ? handleEditRevenue : handleAddRevenue} className="space-y-4">
+            <div>
+              <Label>المصدر</Label>
+              <Input
+                value={revenueForm.source}
+                onChange={(e) => setRevenueForm({ ...revenueForm, source: e.target.value })}
+                placeholder="مصدر الإيراد"
+                required
+              />
+            </div>
+            <div>
+              <Label>المبلغ (ر.س)</Label>
+              <Input
+                type="number"
+                value={revenueForm.amount}
+                onChange={(e) => setRevenueForm({ ...revenueForm, amount: parseInt(e.target.value) || 0 })}
+                required
+              />
+            </div>
+            <div>
+              <Label>التاريخ</Label>
+              <Input
+                type="date"
+                value={revenueForm.date}
+                onChange={(e) => setRevenueForm({ ...revenueForm, date: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label>ملاحظات</Label>
+              <Textarea
+                value={revenueForm.notes}
+                onChange={(e) => setRevenueForm({ ...revenueForm, notes: e.target.value })}
+                placeholder="ملاحظات إضافية (اختياري)"
+              />
+            </div>
+            <Button type="submit" className="w-full" style={{ backgroundColor: '#10b981' }}>
+              {editingRevenue ? 'تحديث' : 'إضافة'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف {itemToDelete?.type === 'expense' ? 'هذا المصروف' : 'هذا الإيراد'}؟ 
+              لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
