@@ -239,9 +239,9 @@ export default function ContractorsPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي التأمينات</p>
+              <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
               <p className="text-3xl font-bold text-gray-900">
-                {contractors.reduce((sum, e) => sum + e. 0).toLocaleString()} ر.س
+                {contractors.reduce((sum, e) => sum + e.salary, 0).toLocaleString()} ر.س
               </p>
             </div>
           </div>
