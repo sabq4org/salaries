@@ -74,3 +74,41 @@ export async function createExpense(data: typeof expenses.$inferInsert) {
   return result[0];
 }
 
+
+
+// Payroll functions
+export async function getAllPayroll(year?: number, month?: number) {
+  let query = db.select().from(employeePayrolls);
+  
+  if (year && month) {
+    query = query.where(eq(employeePayrolls.year, year));
+    // Note: Add month filter if needed
+  }
+  
+  return await query;
+}
+
+export async function createPayroll(data: typeof employeePayrolls.$inferInsert) {
+  const result = await db.insert(employeePayrolls).values(data).returning();
+  return result[0];
+}
+
+export async function updatePayroll(id: number, data: Partial<typeof employeePayrolls.$inferInsert>) {
+  const result = await db.update(employeePayrolls).set(data).where(eq(employeePayrolls.id, id)).returning();
+  return result[0];
+}
+
+export async function deletePayroll(id: number) {
+  await db.delete(employeePayrolls).where(eq(employeePayrolls.id, id));
+}
+
+// Expense functions
+export async function updateExpense(id: number, data: Partial<typeof expenses.$inferInsert>) {
+  const result = await db.update(expenses).set(data).where(eq(expenses.id, id)).returning();
+  return result[0];
+}
+
+export async function deleteExpense(id: number) {
+  await db.delete(expenses).where(eq(expenses.id, id));
+}
+
