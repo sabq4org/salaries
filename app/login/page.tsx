@@ -3,18 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DollarSign } from "lucide-react";
+import { Lock, User, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,75 +20,122 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // For now, simple authentication
-      // TODO: Implement proper authentication with bcrypt
-      if (formData.username === "admin" && formData.password === "admin123") {
-        // Store login state
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("username", formData.username);
-        
-        toast.success("تم تسجيل الدخول بنجاح");
-        router.push("/");
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        toast.success('تم تسجيل الدخول بنجاح');
+        router.push('/');
       } else {
-        toast.error("اسم المستخدم أو كلمة المرور غير صحيحة");
+        toast.error('اسم المستخدم أو كلمة المرور غير صحيحة');
       }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error("حدث خطأ أثناء تسجيل الدخول");
+      console.error('Error:', error);
+      toast.error('حدث خطأ أثناء تسجيل الدخول');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center mb-4">
-            <DollarSign className="text-white" size={32} />
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: '#f8f8f7' }}
+    >
+      <div 
+        className="w-full max-w-md p-8 rounded-2xl shadow-lg"
+        style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+      >
+        {/* Logo & Title */}
+        <div className="text-center mb-8">
+          <div 
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+            style={{ backgroundColor: '#eff6ff' }}
+          >
+            <Lock className="h-8 w-8" style={{ color: '#2563eb' }} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">نظام الميزانية والرواتب</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">صحيفة سبق</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">نظام الرواتب</h1>
+          <p className="text-gray-600">صحيفة سبق</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="username">اسم المستخدم</Label>
-            <Input
-              id="username"
-              type="text"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              placeholder="أدخل اسم المستخدم"
-              required
-              disabled={loading}
-            />
+            <Label htmlFor="username" className="text-gray-700 font-semibold">
+              اسم المستخدم
+            </Label>
+            <div className="relative mt-2">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <User className="h-5 w-5" />
+              </div>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="pr-10 h-12 text-lg"
+                style={{ borderColor: '#f0f0ef' }}
+                placeholder="أدخل اسم المستخدم"
+              />
+            </div>
           </div>
 
           <div>
-            <Label htmlFor="password">كلمة المرور</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="أدخل كلمة المرور"
-              required
-              disabled={loading}
-            />
+            <Label htmlFor="password" className="text-gray-700 font-semibold">
+              كلمة المرور
+            </Label>
+            <div className="relative mt-2">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <Lock className="h-5 w-5" />
+              </div>
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="pr-10 pl-10 h-12 text-lg"
+                style={{ borderColor: '#f0f0ef' }}
+                placeholder="أدخل كلمة المرور"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 text-lg font-semibold text-white"
+            style={{ backgroundColor: '#2563eb' }}
+          >
+            {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>للاختبار:</p>
-          <p className="mt-1">اسم المستخدم: <strong>admin</strong></p>
-          <p>كلمة المرور: <strong>admin123</strong></p>
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            © 2025 صحيفة سبق. جميع الحقوق محفوظة.
+          </p>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
