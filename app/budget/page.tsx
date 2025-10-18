@@ -346,7 +346,7 @@ export default function BudgetPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
+                <tr style={{ borderTop: "1px solid #f0f0ef" }}>
                   <th className="text-right p-2">التاريخ</th>
                   <th className="text-right p-2">النوع</th>
                   <th className="text-right p-2">الوصف</th>
@@ -356,7 +356,7 @@ export default function BudgetPage() {
               </thead>
               <tbody>
                 {expenses.map((expense) => (
-                  <tr key={expense.id} className="border-b">
+                  <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                     <td className="p-2">{MONTHS[expense.month - 1]} {expense.year}</td>
                     <td className="p-2">
                       {EXPENSE_TYPES.find(t => t.value === expense.type)?.label || expense.type}

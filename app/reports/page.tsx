@@ -294,7 +294,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             <tbody>
               {data.employees?.length > 0 ? (
                 data.employees.map((employee, index) => (
-                  <tr key={employee.id} className="border-b">
+                  <tr key={employee.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                     <td className="px-4 py-2">{index + 1}</td>
                     <td className="px-4 py-2">{employee.name}</td>
                     <td className="px-4 py-2">{employee.position}</td>
@@ -333,7 +333,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             <tbody>
               {data.contractors?.length > 0 ? (
                 data.contractors.map((contractor, index) => (
-                  <tr key={contractor.id} className="border-b">
+                  <tr key={contractor.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                     <td className="px-4 py-2">{index + 1}</td>
                     <td className="px-4 py-2">{contractor.name}</td>
                     <td className="px-4 py-2">{contractor.position}</td>
@@ -376,7 +376,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
                 data.payroll.map((payroll, index) => {
                   const employee = data.employees?.find(e => e.id === payroll.employeeId);
                   return (
-                    <tr key={payroll.id} className="border-b">
+                    <tr key={payroll.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                       <td className="px-4 py-2">{index + 1}</td>
                       <td className="px-4 py-2">{employee?.name || 'غير معروف'}</td>
                       <td className="px-4 py-2">{payroll.baseSalary?.toLocaleString()} ر.س</td>
@@ -419,7 +419,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             <tbody>
               {data.expenses?.length > 0 ? (
                 data.expenses.map((expense, index) => (
-                  <tr key={expense.id} className="border-b">
+                  <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                     <td className="px-4 py-2">{index + 1}</td>
                     <td className="px-4 py-2">{MONTHS[expense.month - 1]}</td>
                     <td className="px-4 py-2">

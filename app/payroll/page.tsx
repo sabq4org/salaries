@@ -363,7 +363,7 @@ export default function PayrollPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
+                <tr style={{ borderTop: "1px solid #f0f0ef" }}>
                   <th className="text-right p-2">الموظف</th>
                   <th className="text-right p-2">الراتب الأساسي</th>
                   <th className="text-right p-2">التأمينات الاجتماعية</th>
@@ -375,7 +375,7 @@ export default function PayrollPage() {
               </thead>
               <tbody>
                 {payroll.map((item) => (
-                  <tr key={item.id} className="border-b">
+                  <tr key={item.id} style={{ borderTop: "1px solid #f0f0ef" }}>
                     <td className="p-2">{item.employeeName}</td>
                     <td className="p-2">{item.baseSalary.toLocaleString()} ر.س</td>
                     <td className="p-2">{item.socialInsurance.toLocaleString()} ر.س</td>
