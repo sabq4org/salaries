@@ -344,25 +344,25 @@ export default function BudgetPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
+              <thead style={{ backgroundColor: "#f8f8f7" }}>
                 <tr style={{ borderTop: "1px solid #f0f0ef" }}>
-                  <th className="text-right p-2">التاريخ</th>
-                  <th className="text-right p-2">النوع</th>
-                  <th className="text-right p-2">الوصف</th>
-                  <th className="text-right p-2">المبلغ</th>
-                  <th className="text-right p-2">الإجراءات</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">التاريخ</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الوصف</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
                 {expenses.map((expense) => (
                   <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-2">{MONTHS[expense.month - 1]} {expense.year}</td>
-                    <td className="p-2">
+                    <td className="p-4 text-gray-900">{MONTHS[expense.month - 1]} {expense.year}</td>
+                    <td className="p-4 text-gray-900">
                       {EXPENSE_TYPES.find(t => t.value === expense.type)?.label || expense.type}
                     </td>
-                    <td className="p-2">{expense.description || '-'}</td>
-                    <td className="p-2 font-semibold">{expense.amount.toLocaleString()} ر.س</td>
-                    <td className="p-2">
+                    <td className="p-4 text-gray-900">{expense.description || '-'}</td>
+                    <td className="p-4 text-gray-900">{expense.amount.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900">
                       <div className="flex gap-2">
                         <Button size="sm" variant="ghost" onClick={() => handleEdit(expense)}>
                           <Pencil size={16} />

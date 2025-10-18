@@ -361,27 +361,27 @@ export default function PayrollPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead style={{ backgroundColor: "#f8f8f7" }}>
+              <thead>
                 <tr style={{ borderTop: "1px solid #f0f0ef" }}>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الموظف</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات الاجتماعية</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المكافآت</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الخصومات</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">صافي الراتب</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
+                  <th className="text-right p-2">الموظف</th>
+                  <th className="text-right p-2">الراتب الأساسي</th>
+                  <th className="text-right p-2">التأمينات الاجتماعية</th>
+                  <th className="text-right p-2">المكافآت</th>
+                  <th className="text-right p-2">الخصومات</th>
+                  <th className="text-right p-2">صافي الراتب</th>
+                  <th className="text-right p-2">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
                 {payroll.map((item) => (
                   <tr key={item.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-4 text-gray-900">{item.employeeName}</td>
-                    <td className="p-4 text-gray-900">{item.baseSalary.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">{item.socialInsurance.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">{item.bonus.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">{item.deduction.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">{item.netSalary.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">
+                    <td className="p-2">{item.employeeName}</td>
+                    <td className="p-2">{item.baseSalary.toLocaleString()} ر.س</td>
+                    <td className="p-2">{item.socialInsurance.toLocaleString()} ر.س</td>
+                    <td className="p-2">{item.bonus.toLocaleString()} ر.س</td>
+                    <td className="p-2 text-red-600">{item.deduction.toLocaleString()} ر.س</td>
+                    <td className="p-2 font-semibold">{item.netSalary.toLocaleString()} ر.س</td>
+                    <td className="p-2">
                       <div className="flex gap-2">
                         <Button size="sm" variant="ghost" onClick={() => handleEdit(item)}>
                           <Pencil size={16} />
@@ -396,13 +396,13 @@ export default function PayrollPage() {
               </tbody>
               <tfoot>
                 <tr className="border-t-2 font-bold">
-                  <td className="p-4 text-gray-900">الإجمالي</td>
-                  <td className="p-4 text-gray-900">{payroll.reduce((sum, item) => sum + item.baseSalary, 0).toLocaleString()} ر.س</td>
-                  <td className="p-4 text-gray-900">{payroll.reduce((sum, item) => sum + item.socialInsurance, 0).toLocaleString()} ر.س</td>
-                  <td className="p-4 text-gray-900">{payroll.reduce((sum, item) => sum + item.bonus, 0).toLocaleString()} ر.س</td>
-                  <td className="p-4 text-gray-900">{payroll.reduce((sum, item) => sum + item.deduction, 0).toLocaleString()} ر.س</td>
-                  <td className="p-4 text-gray-900">{payroll.reduce((sum, item) => sum + item.netSalary, 0).toLocaleString()} ر.س</td>
-                  <td className="p-4 text-gray-900"></td>
+                  <td className="p-2">الإجمالي</td>
+                  <td className="p-2">{payroll.reduce((sum, item) => sum + item.baseSalary, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2">{payroll.reduce((sum, item) => sum + item.socialInsurance, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2">{payroll.reduce((sum, item) => sum + item.bonus, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2 text-red-600">{payroll.reduce((sum, item) => sum + item.deduction, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2 text-blue-600">{payroll.reduce((sum, item) => sum + item.netSalary, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2"></td>
                 </tr>
               </tfoot>
             </table>

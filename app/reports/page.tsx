@@ -281,24 +281,24 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead style={{ backgroundColor: "#f8f8f7" }}>
               <tr>
-                <th className="px-4 py-2 text-right">#</th>
-                <th className="px-4 py-2 text-right">الاسم</th>
-                <th className="px-4 py-2 text-right">المنصب</th>
-                <th className="px-4 py-2 text-right">الراتب الأساسي</th>
-                <th className="px-4 py-2 text-right">التأمينات</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
               </tr>
             </thead>
             <tbody>
               {data.employees?.length > 0 ? (
                 data.employees.map((employee, index) => (
                   <tr key={employee.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{employee.name}</td>
-                    <td className="px-4 py-2">{employee.position}</td>
-                    <td className="px-4 py-2">{employee.baseSalary?.toLocaleString()} ر.س</td>
-                    <td className="px-4 py-2">{employee.socialInsurance?.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900">{index + 1}</td>
+                    <td className="p-4 text-gray-900">{employee.name}</td>
+                    <td className="p-4 text-gray-900">{employee.position}</td>
+                    <td className="p-4 text-gray-900">{employee.baseSalary?.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900">{employee.socialInsurance?.toLocaleString()} ر.س</td>
                   </tr>
                 ))
               ) : (
@@ -321,22 +321,22 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead style={{ backgroundColor: "#f8f8f7" }}>
               <tr>
-                <th className="px-4 py-2 text-right">#</th>
-                <th className="px-4 py-2 text-right">الاسم</th>
-                <th className="px-4 py-2 text-right">المنصب</th>
-                <th className="px-4 py-2 text-right">الراتب</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب</th>
               </tr>
             </thead>
             <tbody>
               {data.contractors?.length > 0 ? (
                 data.contractors.map((contractor, index) => (
                   <tr key={contractor.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{contractor.name}</td>
-                    <td className="px-4 py-2">{contractor.position}</td>
-                    <td className="px-4 py-2">{contractor.salary?.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900">{index + 1}</td>
+                    <td className="p-4 text-gray-900">{contractor.name}</td>
+                    <td className="p-4 text-gray-900">{contractor.position}</td>
+                    <td className="p-4 text-gray-900">{contractor.salary?.toLocaleString()} ر.س</td>
                   </tr>
                 ))
               ) : (
@@ -359,15 +359,15 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead style={{ backgroundColor: "#f8f8f7" }}>
               <tr>
-                <th className="px-4 py-2 text-right">#</th>
-                <th className="px-4 py-2 text-right">الموظف</th>
-                <th className="px-4 py-2 text-right">الراتب الأساسي</th>
-                <th className="px-4 py-2 text-right">البدلات</th>
-                <th className="px-4 py-2 text-right">المكافآت</th>
-                <th className="px-4 py-2 text-right">الخصومات</th>
-                <th className="px-4 py-2 text-right">صافي الراتب</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الموظف</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">البدلات</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">المكافآت</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الخصومات</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">صافي الراتب</th>
               </tr>
             </thead>
             <tbody>
@@ -376,13 +376,13 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
                   const employee = data.employees?.find(e => e.id === payroll.employeeId);
                   return (
                     <tr key={payroll.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                      <td className="px-4 py-2">{index + 1}</td>
-                      <td className="px-4 py-2">{employee?.name || 'غير معروف'}</td>
-                      <td className="px-4 py-2">{payroll.baseSalary?.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-2">{payroll.allowance?.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-2">{payroll.bonus?.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-2">{payroll.deduction?.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-2 font-bold">{payroll.netSalary?.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{index + 1}</td>
+                      <td className="p-4 text-gray-900">{employee?.name || 'غير معروف'}</td>
+                      <td className="p-4 text-gray-900">{payroll.baseSalary?.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{payroll.allowance?.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{payroll.bonus?.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{payroll.deduction?.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{payroll.netSalary?.toLocaleString()} ر.س</td>
                     </tr>
                   );
                 })
@@ -406,28 +406,28 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead style={{ backgroundColor: "#f8f8f7" }}>
               <tr>
-                <th className="px-4 py-2 text-right">#</th>
-                <th className="px-4 py-2 text-right">الشهر</th>
-                <th className="px-4 py-2 text-right">النوع</th>
-                <th className="px-4 py-2 text-right">الوصف</th>
-                <th className="px-4 py-2 text-right">المبلغ</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الشهر</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">الوصف</th>
+                <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
               </tr>
             </thead>
             <tbody>
               {data.expenses?.length > 0 ? (
                 data.expenses.map((expense, index) => (
                   <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{MONTHS[expense.month - 1]}</td>
-                    <td className="px-4 py-2">
+                    <td className="p-4 text-gray-900">{index + 1}</td>
+                    <td className="p-4 text-gray-900">{MONTHS[expense.month - 1]}</td>
+                    <td className="p-4 text-gray-900">
                       {expense.type === 'salary' ? 'رواتب' :
                        expense.type === 'operational' ? 'تشغيلية' :
                        expense.type === 'marketing' ? 'تسويق' : 'أخرى'}
                     </td>
-                    <td className="px-4 py-2">{expense.description || '-'}</td>
-                    <td className="px-4 py-2 font-bold">{expense.amount?.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900">{expense.description || '-'}</td>
+                    <td className="p-4 text-gray-900">{expense.amount?.toLocaleString()} ر.س</td>
                   </tr>
                 ))
               ) : (
@@ -442,7 +442,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <tfoot className="bg-gray-50 font-bold">
                 <tr>
                   <td colSpan={4} className="px-4 py-2 text-right">الإجمالي</td>
-                  <td className="px-4 py-2">{stats.yearlyExpenses.toLocaleString()} ر.س</td>
+                  <td className="p-4 text-gray-900">{stats.yearlyExpenses.toLocaleString()} ر.س</td>
                 </tr>
               </tfoot>
             )}
