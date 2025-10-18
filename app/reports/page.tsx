@@ -1,455 +1,350 @@
 "use client";
-"use client";
-
-import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FileText, Download, Users, DollarSign, TrendingUp, Calendar } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
+import { Users, DollarSign, TrendingUp, FileText } from "lucide-react";
+import { toast } from "sonner";
 
-interface ReportData {
-  employees: any[];
-  contractors: any[];
-  payroll: any[];
-  expenses: any[];
+interface Employee {
+  id: number;
+  name: string;
+  position: string | null;
+  baseSalary: number;
+  socialInsurance: number;
 }
 
-const MONTHS = [
-  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
-  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-];
+interface Contractor {
+  id: number;
+  name: string;
+  position: string | null;
+  salary: number;
+}
+
+interface Payroll {
+  id: number;
+  employeeId: number;
+  year: number;
+  month: number;
+  netSalary: number;
+}
+
+interface Expense {
+  id: number;
+  year: number;
+  month: number;
+  type: string;
+  amount: number;
+}
 
 export default function ReportsPage() {
-  const [data, setData] = useState<ReportData>({
-    employees: [],
-    contractors: [],
-    payroll: [],
-    expenses: [],
-  });
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [contractors, setContractors] = useState<Contractor[]>([]);
+  const [payroll, setPayroll] = useState<Payroll[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     fetchAllData();
-  }, [selectedYear, selectedMonth]);
+  }, []);
 
   const fetchAllData = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      const [employeesRes, contractorsRes, payrollRes, expensesRes] = await Promise.all([
+      const [empRes, conRes, payRes, expRes] = await Promise.all([
         fetch('/api/employees'),
         fetch('/api/contractors'),
-        fetch(`/api/payroll?year=${selectedYear}&month=${selectedMonth}`),
+        fetch(`/api/payroll?year=${selectedYear}`),
         fetch(`/api/expenses?year=${selectedYear}`),
       ]);
 
-      // Check if all responses are ok
-      if (!employeesRes.ok || !contractorsRes.ok || !payrollRes.ok || !expensesRes.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const [employees, contractors, payroll, expenses] = await Promise.all([
-        employeesRes.json(),
-        contractorsRes.json(),
-        payrollRes.json(),
-        expensesRes.json(),
-      ]);
-
-      setData({ 
-        employees: employees || [], 
-        contractors: contractors || [], 
-        payroll: payroll || [], 
-        expenses: expenses || [] 
-      });
+      if (empRes.ok) setEmployees(await empRes.json());
+      if (conRes.ok) setContractors(await conRes.json());
+      if (payRes.ok) setPayroll(await payRes.json());
+      if (expRes.ok) setExpenses(await expRes.json());
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('فشل في تحميل البيانات');
+      console.error('Error:', error);
+      toast.error('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateStats = () => {
-    const totalEmployees = data.employees?.length || 0;
-    const totalContractors = data.contractors?.length || 0;
-    const monthlyPayroll = data.payroll?.reduce((sum, p) => sum + (p.netSalary || 0), 0) || 0;
-    const yearlyExpenses = data.expenses?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0;
-    const averageSalary = data.employees?.length > 0
-      ? data.employees.reduce((sum, e) => sum + (e.baseSalary || 0), 0) / data.employees.length
-      : 0;
+  const totalEmployeeSalaries = employees.reduce((sum, e) => sum + e.baseSalary, 0);
+  const totalContractorSalaries = contractors.reduce((sum, c) => sum + c.salary, 0);
+  const totalPayroll = payroll.reduce((sum, p) => sum + p.netSalary, 0);
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalCost = totalPayroll + totalExpenses;
 
-    return {
-      totalEmployees,
-      totalContractors,
-      monthlyPayroll,
-      yearlyExpenses,
-      averageSalary,
-    };
-  };
+  const expensesByType = expenses.reduce((acc, exp) => {
+    acc[exp.type] = (acc[exp.type] || 0) + exp.amount;
+    return acc;
+  }, {} as Record<string, number>);
 
-  const generateReport = () => {
-    const stats = calculateStats();
-    const reportContent = `
-تقرير الرواتب والميزانية
-صحيفة سبق
-
-التاريخ: ${new Date().toLocaleDateString('ar-SA')}
-الفترة: ${MONTHS[selectedMonth - 1]} ${selectedYear}
-
-===========================================
-
-📊 ملخص الإحصائيات:
-- عدد الموظفين الرسميين: ${stats.totalEmployees}
-- عدد المتعاونين: ${stats.totalContractors}
-- الرواتب الشهرية: ${stats.monthlyPayroll.toLocaleString()} ر.س
-- المصروفات السنوية: ${stats.yearlyExpenses.toLocaleString()} ر.س
-- متوسط الراتب: ${Math.round(stats.averageSalary).toLocaleString()} ر.س
-
-===========================================
-
-👥 الموظفون الرسميون:
-${data.employees?.map((e, i) => `${i + 1}. ${e.name} - ${e.position} - ${e.baseSalary?.toLocaleString()} ر.س`).join('\n') || 'لا توجد بيانات'}
-
-===========================================
-
-🤝 المتعاونون:
-${data.contractors?.map((c, i) => `${i + 1}. ${c.name} - ${c.position} - ${c.salary?.toLocaleString()} ر.س`).join('\n') || 'لا توجد بيانات'}
-
-===========================================
-
-💰 مسير الرواتب لشهر ${MONTHS[selectedMonth - 1]} ${selectedYear}:
-${data.payroll?.map((p, i) => {
-  const employee = data.employees?.find(e => e.id === p.employeeId);
-  return `${i + 1}. ${employee?.name || 'غير معروف'} - صافي الراتب: ${p.netSalary?.toLocaleString()} ر.س`;
-}).join('\n') || 'لا توجد بيانات'}
-
-===========================================
-
-📊 المصروفات السنوية ${selectedYear}:
-${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amount?.toLocaleString()} ر.س (${MONTHS[e.month - 1]})`).join('\n') || 'لا توجد بيانات'}
-
-===========================================
-
-إجمالي المصروفات: ${stats.yearlyExpenses.toLocaleString()} ر.س
-`;
-
-    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `تقرير_${MONTHS[selectedMonth - 1]}_${selectedYear}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const typeLabels: Record<string, string> = {
+    salary: 'رواتب',
+    operational: 'تشغيلية',
+    marketing: 'تسويق',
+    other: 'أخرى',
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل البيانات...</p>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-xl">جاري التحميل...</div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="p-6 max-w-md">
-          <div className="text-center text-red-600">
-            <FileText className="h-12 w-12 mx-auto mb-4" />
-            <p className="text-lg font-semibold mb-2">خطأ في تحميل التقرير</p>
-            <p className="text-sm mb-4">{error}</p>
-            <Button onClick={fetchAllData}>إعادة المحاولة</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const stats = calculateStats();
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto p-6 max-w-7xl" dir="rtl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">التقارير</h1>
-        <Button onClick={generateReport} className="gap-2">
-          <Download className="h-4 w-4" />
-          تحميل التقرير
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>الشهر</Label>
-            <Select
-              value={selectedMonth.toString()}
-              onValueChange={(value) => setSelectedMonth(parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {MONTHS.map((month, index) => (
-                  <SelectItem key={index} value={(index + 1).toString()}>
-                    {month}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>السنة</Label>
-            <Input
-              type="number"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              min="2020"
-              max="2030"
-            />
-          </div>
+      <div className="p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">التقارير الشاملة</h1>
+          <p className="text-gray-600">ملخص شامل للموظفين والرواتب والمصروفات</p>
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-blue-600" />
-            <div>
-              <p className="text-sm text-gray-600">الموظفون</p>
-              <p className="text-2xl font-bold">{stats.totalEmployees}</p>
+        {/* Main Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">إجمالي الموظفين</p>
+                <p className="text-3xl font-bold text-gray-900">{employees.length}</p>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              >
+                <Users className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">إجمالي المتعاونين</p>
+                <p className="text-3xl font-bold text-gray-900">{contractors.length}</p>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
+              >
+                <Users className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
+                <p className="text-2xl font-bold text-gray-900">{totalPayroll.toLocaleString()} ر.س</p>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#fef3f2', color: '#dc2626' }}
+              >
+                <DollarSign className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">إجمالي المصروفات</p>
+                <p className="text-2xl font-bold text-gray-900">{totalCost.toLocaleString()} ر.س</p>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#fef9c3', color: '#ca8a04' }}
+              >
+                <TrendingUp className="h-6 w-6" />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-green-600" />
-            <div>
-              <p className="text-sm text-gray-600">المتعاونون</p>
-              <p className="text-2xl font-bold">{stats.totalContractors}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <DollarSign className="h-8 w-8 text-purple-600" />
-            <div>
-              <p className="text-sm text-gray-600">الرواتب الشهرية</p>
-              <p className="text-2xl font-bold">{stats.monthlyPayroll.toLocaleString()} ر.س</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="h-8 w-8 text-red-600" />
-            <div>
-              <p className="text-sm text-gray-600">المصروفات السنوية</p>
-              <p className="text-2xl font-bold">{stats.yearlyExpenses.toLocaleString()} ر.س</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Employees Report */}
-      <div className="p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          الموظفون الرسميون
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{ backgroundColor: "#f8f8f7" }}>
-              <tr>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.employees?.length > 0 ? (
-                data.employees.map((employee, index) => (
-                  <tr key={employee.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-4 text-gray-900">{index + 1}</td>
-                    <td className="p-4 text-gray-900">{employee.name}</td>
-                    <td className="p-4 text-gray-900">{employee.position}</td>
-                    <td className="p-4 text-gray-900">{employee.baseSalary?.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">{employee.socialInsurance?.toLocaleString()} ر.س</td>
-                  </tr>
-                ))
-              ) : (
+        {/* Employees Summary */}
+        <div 
+          className="p-6 rounded-xl mb-8"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        >
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <FileText className="ml-2" size={24} />
+            ملخص الموظفين الرسميين
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f8f7' }}>
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                    لا توجد بيانات
-                  </td>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Contractors Report */}
-      <div className="p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          المتعاونون
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{ backgroundColor: "#f8f8f7" }}>
-              <tr>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.contractors?.length > 0 ? (
-                data.contractors.map((contractor, index) => (
-                  <tr key={contractor.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-4 text-gray-900">{index + 1}</td>
-                    <td className="p-4 text-gray-900">{contractor.name}</td>
-                    <td className="p-4 text-gray-900">{contractor.position}</td>
-                    <td className="p-4 text-gray-900">{contractor.salary?.toLocaleString()} ر.س</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                    لا توجد بيانات
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Payroll Report */}
-      <div className="p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <DollarSign className="h-5 w-5" />
-          مسير الرواتب - {MONTHS[selectedMonth - 1]} {selectedYear}
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{ backgroundColor: "#f8f8f7" }}>
-              <tr>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الموظف</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">البدلات</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">المكافآت</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الخصومات</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">صافي الراتب</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.payroll?.length > 0 ? (
-                data.payroll.map((payroll, index) => {
-                  const employee = data.employees?.find(e => e.id === payroll.employeeId);
-                  return (
-                    <tr key={payroll.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                      <td className="p-4 text-gray-900">{index + 1}</td>
-                      <td className="p-4 text-gray-900">{employee?.name || 'غير معروف'}</td>
-                      <td className="p-4 text-gray-900">{payroll.baseSalary?.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{payroll.allowance?.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{payroll.bonus?.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{payroll.deduction?.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{payroll.netSalary?.toLocaleString()} ر.س</td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    لا توجد بيانات لهذا الشهر
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Expenses Report */}
-      <div className="p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          المصروفات السنوية - {selectedYear}
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{ backgroundColor: "#f8f8f7" }}>
-              <tr>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">#</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الشهر</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">الوصف</th>
-                <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.expenses?.length > 0 ? (
-                data.expenses.map((expense, index) => (
-                  <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-4 text-gray-900">{index + 1}</td>
-                    <td className="p-4 text-gray-900">{MONTHS[expense.month - 1]}</td>
-                    <td className="p-4 text-gray-900">
-                      {expense.type === 'salary' ? 'رواتب' :
-                       expense.type === 'operational' ? 'تشغيلية' :
-                       expense.type === 'marketing' ? 'تسويق' : 'أخرى'}
+              </thead>
+              <tbody>
+                {employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="text-center p-8 text-gray-500">
+                      لا توجد بيانات
                     </td>
-                    <td className="p-4 text-gray-900">{expense.description || '-'}</td>
-                    <td className="p-4 text-gray-900">{expense.amount?.toLocaleString()} ر.س</td>
                   </tr>
-                ))
-              ) : (
+                ) : (
+                  employees.map((emp, index) => (
+                    <tr 
+                      key={emp.id}
+                      style={{ 
+                        borderTop: '1px solid #f0f0ef',
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-900 font-medium">{emp.name}</td>
+                      <td className="p-4 text-gray-900">{emp.position || '-'}</td>
+                      <td className="p-4 text-gray-900">{emp.baseSalary.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">{emp.socialInsurance.toLocaleString()} ر.س</td>
+                    </tr>
+                  ))
+                )}
+                {employees.length > 0 && (
+                  <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
+                    <td colSpan={2} className="p-4 text-gray-900 font-bold">الإجمالي</td>
+                    <td className="p-4 text-gray-900 font-bold">{totalEmployeeSalaries.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900 font-bold">
+                      {employees.reduce((sum, e) => sum + e.socialInsurance, 0).toLocaleString()} ر.س
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Contractors Summary */}
+        <div 
+          className="p-6 rounded-xl mb-8"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        >
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <FileText className="ml-2" size={24} />
+            ملخص المتعاونين
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f8f7' }}>
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                    لا توجد بيانات لهذه السنة
-                  </td>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب</th>
                 </tr>
-              )}
-            </tbody>
-            {data.expenses?.length > 0 && (
-              <tfoot className="bg-gray-50 font-bold">
+              </thead>
+              <tbody>
+                {contractors.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="text-center p-8 text-gray-500">
+                      لا توجد بيانات
+                    </td>
+                  </tr>
+                ) : (
+                  contractors.map((con, index) => (
+                    <tr 
+                      key={con.id}
+                      style={{ 
+                        borderTop: '1px solid #f0f0ef',
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-900 font-medium">{con.name}</td>
+                      <td className="p-4 text-gray-900">{con.position || '-'}</td>
+                      <td className="p-4 text-gray-900">{con.salary.toLocaleString()} ر.س</td>
+                    </tr>
+                  ))
+                )}
+                {contractors.length > 0 && (
+                  <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
+                    <td colSpan={2} className="p-4 text-gray-900 font-bold">الإجمالي</td>
+                    <td className="p-4 text-gray-900 font-bold">{totalContractorSalaries.toLocaleString()} ر.س</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Expenses Summary */}
+        <div 
+          className="p-6 rounded-xl"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        >
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <FileText className="ml-2" size={24} />
+            ملخص المصروفات حسب النوع
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead style={{ backgroundColor: '#f8f8f7' }}>
                 <tr>
-                  <td colSpan={4} className="px-4 py-2 text-right">الإجمالي</td>
-                  <td className="p-4 text-gray-900">{stats.yearlyExpenses.toLocaleString()} ر.س</td>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
+                  <th className="text-right p-4 text-sm font-semibold text-gray-700">النسبة</th>
                 </tr>
-              </tfoot>
-            )}
-          </table>
+              </thead>
+              <tbody>
+                {Object.keys(expensesByType).length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="text-center p-8 text-gray-500">
+                      لا توجد مصروفات
+                    </td>
+                  </tr>
+                ) : (
+                  Object.entries(expensesByType).map(([type, amount], index) => (
+                    <tr 
+                      key={type}
+                      style={{ 
+                        borderTop: '1px solid #f0f0ef',
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-900 font-medium">{typeLabels[type] || type}</td>
+                      <td className="p-4 text-gray-900">{amount.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-gray-900">
+                        {totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : 0}%
+                      </td>
+                    </tr>
+                  ))
+                )}
+                {Object.keys(expensesByType).length > 0 && (
+                  <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
+                    <td className="p-4 text-gray-900 font-bold">الإجمالي</td>
+                    <td className="p-4 text-gray-900 font-bold">{totalExpenses.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-gray-900 font-bold">100%</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
     </DashboardLayout>
   );
 }

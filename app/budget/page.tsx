@@ -1,9 +1,7 @@
 "use client";
-"use client";
-
-import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,37 +12,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, Pencil, Trash2, DollarSign, TrendingUp, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 interface Expense {
   id: number;
   year: number;
   month: number;
-  type: string;
+  type: 'salary' | 'operational' | 'marketing' | 'other';
   description: string | null;
   amount: number;
 }
-
-const MONTHS = [
-  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
-  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-];
-
-const EXPENSE_TYPES = [
-  { value: "salary", label: "رواتب" },
-  { value: "operational", label: "تشغيلية" },
-  { value: "marketing", label: "تسويق" },
-  { value: "other", label: "أخرى" },
-];
 
 export default function BudgetPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -55,8 +33,8 @@ export default function BudgetPage() {
   const [formData, setFormData] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
-    type: "operational",
-    description: "",
+    type: 'operational' as 'salary' | 'operational' | 'marketing' | 'other',
+    description: '',
     amount: 0,
   });
 
@@ -95,7 +73,13 @@ export default function BudgetPage() {
       toast.success(editingId ? 'تم تحديث المصروف بنجاح' : 'تم إضافة المصروف بنجاح');
       setOpen(false);
       setEditingId(null);
-      resetForm();
+      setFormData({
+        year: selectedYear,
+        month: new Date().getMonth() + 1,
+        type: 'operational',
+        description: '',
+        amount: 0,
+      });
       fetchExpenses();
     } catch (error) {
       console.error('Error:', error);
@@ -109,7 +93,7 @@ export default function BudgetPage() {
       year: expense.year,
       month: expense.month,
       type: expense.type,
-      description: expense.description || "",
+      description: expense.description || '',
       amount: expense.amount,
     });
     setOpen(true);
@@ -130,256 +114,294 @@ export default function BudgetPage() {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      year: new Date().getFullYear(),
-      month: new Date().getMonth() + 1,
-      type: "operational",
-      description: "",
-      amount: 0,
-    });
-  };
-
   const handleDialogClose = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
       setEditingId(null);
-      resetForm();
+      setFormData({
+        year: selectedYear,
+        month: new Date().getMonth() + 1,
+        type: 'operational',
+        description: '',
+        amount: 0,
+      });
     }
   };
 
-  const getExpensesByType = () => {
-    return EXPENSE_TYPES.map(type => ({
-      ...type,
-      total: expenses
-        .filter(e => e.type === type.value)
-        .reduce((sum, e) => sum + e.amount, 0)
-    }));
+  const typeLabels: Record<string, string> = {
+    salary: 'رواتب',
+    operational: 'تشغيلية',
+    marketing: 'تسويق',
+    other: 'أخرى',
   };
 
-  const getTotalExpenses = () => {
-    return expenses.reduce((sum, e) => sum + e.amount, 0);
+  const months = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+  ];
+
+  const totalByType = (type: string) => {
+    return expenses.filter(e => e.type === type).reduce((sum, e) => sum + e.amount, 0);
   };
 
-  const getMonthlyExpenses = () => {
-    const monthly = Array(12).fill(0);
-    expenses.forEach(e => {
-      if (e.month >= 1 && e.month <= 12) {
-        monthly[e.month - 1] += e.amount;
-      }
-    });
-    return monthly;
-  };
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-xl">جاري التحميل...</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">الميزانية السنوية</h1>
-        <Dialog open={open} onOpenChange={handleDialogClose}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="ml-2" size={20} />
-              إضافة مصروف
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>{editingId ? 'تعديل المصروف' : 'إضافة مصروف جديد'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+      <div className="p-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">الميزانية السنوية</h1>
+            <p className="text-gray-600">تتبع وإدارة المصروفات السنوية</p>
+          </div>
+          <Dialog open={open} onOpenChange={handleDialogClose}>
+            <DialogTrigger asChild>
+              <Button style={{ backgroundColor: '#2563eb' }} className="text-white">
+                <Plus className="ml-2" size={20} />
+                إضافة مصروف
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">
+                  {editingId ? 'تعديل مصروف' : 'إضافة مصروف جديد'}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="year">السنة</Label>
+                    <Input
+                      id="year"
+                      type="number"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="month">الشهر</Label>
+                    <select
+                      id="month"
+                      value={formData.month}
+                      onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) })}
+                      required
+                      className="w-full mt-1 p-2 border rounded-md"
+                    >
+                      {months.map((month, index) => (
+                        <option key={index} value={index + 1}>{month}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <div>
-                  <Label htmlFor="year">السنة</Label>
-                  <Input
-                    id="year"
-                    type="number"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })}
+                  <Label htmlFor="type">نوع المصروف</Label>
+                  <select
+                    id="type"
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                     required
+                    className="w-full mt-1 p-2 border rounded-md"
+                  >
+                    <option value="salary">رواتب</option>
+                    <option value="operational">تشغيلية</option>
+                    <option value="marketing">تسويق</option>
+                    <option value="other">أخرى</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="description">الوصف</Label>
+                  <Input
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="mt-1"
+                    placeholder="وصف المصروف (اختياري)"
                   />
                 </div>
-
                 <div>
-                  <Label htmlFor="month">الشهر</Label>
-                  <Select
-                    value={formData.month.toString()}
-                    onValueChange={(value) => setFormData({ ...formData, month: parseInt(value) })}
+                  <Label htmlFor="amount">المبلغ (ر.س)</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: parseInt(e.target.value) || 0 })}
                     required
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MONTHS.map((month, index) => (
-                        <SelectItem key={index} value={(index + 1).toString()}>
-                          {month}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    className="mt-1"
+                  />
                 </div>
-              </div>
+                <div className="flex gap-2 pt-4">
+                  <Button type="submit" style={{ backgroundColor: '#2563eb' }} className="flex-1 text-white">
+                    {editingId ? 'حفظ التعديلات' : 'إضافة'}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
+                    إلغاء
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-              <div>
-                <Label htmlFor="type">نوع المصروف</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value })}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPENSE_TYPES.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="amount">المبلغ</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: parseInt(e.target.value) || 0 })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">الوصف</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="أدخل وصف المصروف"
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
-                  إلغاء
-                </Button>
-                <Button type="submit">{editingId ? 'تحديث' : 'حفظ'}</Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Year Filter */}
-      <div className="p-4 mb-6">
-        <div className="flex items-center gap-4">
-          <Label>السنة:</Label>
+        {/* Year Selector */}
+        <div className="mb-8">
+          <Label>السنة</Label>
           <Input
             type="number"
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value) || new Date().getFullYear())}
-            className="w-[120px]"
+            className="mt-1 max-w-xs"
           />
         </div>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-red-100 text-sm mb-1">إجمالي المصروفات</p>
-              <p className="text-2xl font-bold">{getTotalExpenses().toLocaleString()} ر.س</p>
-            </div>
-            <TrendingDown size={40} className="text-red-200" />
-          </div>
-        </div>
-
-        {getExpensesByType().slice(0, 3).map((type, index) => (
-          <div key={type.value} className="p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm mb-1">{type.label}</p>
-                <p className="text-2xl font-bold">{type.total.toLocaleString()} ر.س</p>
+                <p className="text-sm text-gray-600 mb-1">رواتب</p>
+                <p className="text-2xl font-bold text-gray-900">{totalByType('salary').toLocaleString()} ر.س</p>
               </div>
-              <TrendingUp size={40} className="text-gray-400" />
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              >
+                <DollarSign className="h-6 w-6" />
+              </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Monthly Chart */}
-      <div className="p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">المصروفات الشهرية</h2>
-        <div className="grid grid-cols-12 gap-2">
-          {getMonthlyExpenses().map((amount, index) => {
-            const maxAmount = Math.max(...getMonthlyExpenses());
-            const height = maxAmount > 0 ? (amount / maxAmount) * 200 : 0;
-            
-            return (
-              <div key={index} className="flex flex-col items-center gap-2">
-                <div className="text-xs text-gray-600">{amount.toLocaleString()}</div>
-                <div
-                  className="w-full bg-blue-500 rounded-t"
-                  style={{ height: `${height}px`, minHeight: amount > 0 ? '20px' : '0' }}
-                />
-                <div className="text-xs text-gray-600">{MONTHS[index].slice(0, 3)}</div>
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">تشغيلية</p>
+                <p className="text-2xl font-bold text-gray-900">{totalByType('operational').toLocaleString()} ر.س</p>
               </div>
-            );
-          })}
-        </div>
-      </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
+              >
+                <TrendingUp className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
 
-      {/* Expenses Table */}
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">سجل المصروفات</h2>
-        {loading ? (
-          <p>جاري التحميل...</p>
-        ) : expenses.length === 0 ? (
-          <p className="text-muted-foreground">لا توجد بيانات لهذه السنة</p>
-        ) : (
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">تسويق</p>
+                <p className="text-2xl font-bold text-gray-900">{totalByType('marketing').toLocaleString()} ر.س</p>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: '#fef3f2', color: '#dc2626' }}
+              >
+                <Calendar className="h-6 w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="p-6 rounded-xl"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">الإجمالي</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {expenses.reduce((sum, e) => sum + e.amount, 0).toLocaleString()} ر.س
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div 
+          className="p-6 rounded-xl"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        >
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead style={{ backgroundColor: "#f8f8f7" }}>
-                <tr style={{ borderTop: "1px solid #f0f0ef" }}>
+              <thead style={{ backgroundColor: '#f8f8f7' }}>
+                <tr>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">التاريخ</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">الوصف</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
+                  <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
-                {expenses.map((expense) => (
-                  <tr key={expense.id} style={{ borderTop: "1px solid #f0f0ef" }}>
-                    <td className="p-4 text-gray-900">{MONTHS[expense.month - 1]} {expense.year}</td>
-                    <td className="p-4 text-gray-900">
-                      {EXPENSE_TYPES.find(t => t.value === expense.type)?.label || expense.type}
-                    </td>
-                    <td className="p-4 text-gray-900">{expense.description || '-'}</td>
-                    <td className="p-4 text-gray-900">{expense.amount.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="ghost" onClick={() => handleEdit(expense)}>
-                          <Pencil size={16} />
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleDelete(expense.id)}>
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
+                {expenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center p-8 text-gray-500">
+                      لا توجد مصروفات لهذه السنة
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  expenses.map((expense, index) => (
+                    <tr 
+                      key={expense.id}
+                      style={{ 
+                        borderTop: '1px solid #f0f0ef',
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                      }}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-900 font-medium">
+                        {months[expense.month - 1]} {expense.year}
+                      </td>
+                      <td className="p-4 text-gray-900">{typeLabels[expense.type]}</td>
+                      <td className="p-4 text-gray-600">{expense.description || '-'}</td>
+                      <td className="p-4 text-gray-900 font-bold">{expense.amount.toLocaleString()} ر.س</td>
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(expense)}
+                            className="hover:bg-blue-50"
+                          >
+                            <Pencil className="h-4 w-4" style={{ color: '#2563eb' }} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(expense.id)}
+                            className="hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" style={{ color: '#dc2626' }} />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
-        )}
+        </div>
       </div>
-    </div>
     </DashboardLayout>
   );
 }
