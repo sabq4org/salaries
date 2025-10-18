@@ -5,7 +5,6 @@ import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -172,14 +171,14 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Card className="p-6 max-w-md">
+        <div className="p-6 max-w-md">
           <div className="text-center text-red-600">
             <FileText className="h-12 w-12 mx-auto mb-4" />
             <p className="text-lg font-semibold mb-2">خطأ في تحميل التقرير</p>
             <p className="text-sm mb-4">{error}</p>
             <Button onClick={fetchAllData}>إعادة المحاولة</Button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -198,7 +197,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
       </div>
 
       {/* Filters */}
-      <Card className="p-4 mb-6">
+      <div className="p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>الشهر</Label>
@@ -229,11 +228,11 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             />
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="p-4">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <Users className="h-8 w-8 text-blue-600" />
             <div>
@@ -241,9 +240,9 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.totalEmployees}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <Users className="h-8 w-8 text-green-600" />
             <div>
@@ -251,9 +250,9 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.totalContractors}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <DollarSign className="h-8 w-8 text-purple-600" />
             <div>
@@ -261,9 +260,9 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.monthlyPayroll.toLocaleString()} ر.س</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <TrendingUp className="h-8 w-8 text-red-600" />
             <div>
@@ -271,11 +270,11 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.yearlyExpenses.toLocaleString()} ر.س</p>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Employees Report */}
-      <Card className="p-6 mb-6">
+      <div className="p-6 mb-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Users className="h-5 w-5" />
           الموظفون الرسميون
@@ -312,10 +311,10 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* Contractors Report */}
-      <Card className="p-6 mb-6">
+      <div className="p-6 mb-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Users className="h-5 w-5" />
           المتعاونون
@@ -350,10 +349,10 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* Payroll Report */}
-      <Card className="p-6 mb-6">
+      <div className="p-6 mb-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
           مسير الرواتب - {MONTHS[selectedMonth - 1]} {selectedYear}
@@ -397,10 +396,10 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* Expenses Report */}
-      <Card className="p-6">
+      <div className="p-6">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
           المصروفات السنوية - {selectedYear}
@@ -449,7 +448,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             )}
           </table>
         </div>
-      </Card>
+      </div>
     </div>
     </DashboardLayout>
   );

@@ -5,7 +5,6 @@ import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -329,7 +328,7 @@ export default function PayrollPage() {
       </div>
 
       {/* Filter */}
-      <Card className="p-4 mb-6">
+      <div className="p-4 mb-6">
         <div className="flex items-center gap-4">
           <Calendar size={20} className="text-gray-600" />
           <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
@@ -351,9 +350,9 @@ export default function PayrollPage() {
             className="w-[120px]"
           />
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-6">
+      <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">سجلات الرواتب</h2>
         {loading ? (
           <p>جاري التحميل...</p>
@@ -409,7 +408,7 @@ export default function PayrollPage() {
             </table>
           </div>
         )}
-      </Card>
+      </div>
     </div>
     </DashboardLayout>
   );

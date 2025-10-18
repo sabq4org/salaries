@@ -5,7 +5,6 @@ import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -276,7 +275,7 @@ export default function BudgetPage() {
       </div>
 
       {/* Year Filter */}
-      <Card className="p-4 mb-6">
+      <div className="p-4 mb-6">
         <div className="flex items-center gap-4">
           <Label>السنة:</Label>
           <Input
@@ -286,11 +285,11 @@ export default function BudgetPage() {
             className="w-[120px]"
           />
         </div>
-      </Card>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
+        <div className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-red-100 text-sm mb-1">إجمالي المصروفات</p>
@@ -298,10 +297,10 @@ export default function BudgetPage() {
             </div>
             <TrendingDown size={40} className="text-red-200" />
           </div>
-        </Card>
+        </div>
 
         {getExpensesByType().slice(0, 3).map((type, index) => (
-          <Card key={type.value} className="p-6">
+          <div key={type.value} className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm mb-1">{type.label}</p>
@@ -309,12 +308,12 @@ export default function BudgetPage() {
               </div>
               <TrendingUp size={40} className="text-gray-400" />
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Monthly Chart */}
-      <Card className="p-6 mb-6">
+      <div className="p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">المصروفات الشهرية</h2>
         <div className="grid grid-cols-12 gap-2">
           {getMonthlyExpenses().map((amount, index) => {
@@ -333,10 +332,10 @@ export default function BudgetPage() {
             );
           })}
         </div>
-      </Card>
+      </div>
 
       {/* Expenses Table */}
-      <Card className="p-6">
+      <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">سجل المصروفات</h2>
         {loading ? (
           <p>جاري التحميل...</p>
@@ -379,7 +378,7 @@ export default function BudgetPage() {
             </table>
           </div>
         )}
-      </Card>
+      </div>
     </div>
     </DashboardLayout>
   );
