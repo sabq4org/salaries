@@ -1,4 +1,7 @@
 "use client";
+"use client";
+
+import DashboardLayout from "@/components/DashboardLayout";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
