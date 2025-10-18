@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import StatsCard from "@/components/StatsCard";
+import RemindersAlert from "@/components/RemindersAlert";
 import { 
   Users, 
   UserCheck, 
@@ -86,6 +87,9 @@ export default function HomePage() {
           نظرة عامة على الموظفين والرواتب والميزانية
         </p>
       </div>
+
+      {/* Reminders Alert */}
+      <RemindersAlert />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard

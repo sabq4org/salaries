@@ -167,3 +167,42 @@ export const leaveSettlements = pgTable("leaveSettlements", {
 export type LeaveSettlement = typeof leaveSettlements.$inferSelect;
 export type InsertLeaveSettlement = typeof leaveSettlements.$inferInsert;
 
+
+
+/**
+ * جدول التذكيرات
+ */
+export const reminderTypeEnum = pgEnum('reminder_type', [
+  'residence_expiry',   // انتهاء إقامة
+  'leave_start',        // بداية إجازة
+  'leave_end',          // نهاية إجازة
+  'insurance_payment',  // استحقاق تأمينات
+  'contract_renewal',   // تجديد عقد
+  'document_expiry',    // انتهاء وثيقة
+  'other'               // أخرى
+]);
+
+export const reminderStatusEnum = pgEnum('reminder_status', [
+  'pending',    // قادم
+  'due_soon',   // قريب
+  'overdue',    // متأخر
+  'completed'   // مكتمل
+]);
+
+export const reminders = pgTable("reminders", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  type: reminderTypeEnum("type").notNull(),
+  employeeId: integer("employeeId"),
+  startDate: timestamp("startDate"),
+  dueDate: timestamp("dueDate").notNull(),
+  notes: text("notes"),
+  status: reminderStatusEnum("status").notNull().default('pending'),
+  isCompleted: boolean("isCompleted").notNull().default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type Reminder = typeof reminders.$inferSelect;
+export type InsertReminder = typeof reminders.$inferInsert;
+
