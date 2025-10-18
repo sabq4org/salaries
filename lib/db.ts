@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import { eq } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 
-const { employees, contractors, employeePayrolls, contractorPayrolls, expenses } = schema;
+const { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements } = schema;
 
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
 const client = postgres(connectionString, { prepare: false });
@@ -113,5 +113,28 @@ export async function updateExpense(id: number, data: Partial<typeof expenses.$i
 
 export async function deleteExpense(id: number) {
   await db.delete(expenses).where(eq(expenses.id, id));
+}
+
+// Leave Settlements
+export async function getAllLeaveSettlements() {
+  return await db.select().from(leaveSettlements).orderBy(leaveSettlements.createdAt);
+}
+
+export async function getLeaveSettlementsByEmployee(employeeId: number) {
+  return await db.select().from(leaveSettlements).where(eq(leaveSettlements.employeeId, employeeId));
+}
+
+export async function createLeaveSettlement(data: typeof leaveSettlements.$inferInsert) {
+  const result = await db.insert(leaveSettlements).values(data).returning();
+  return result[0];
+}
+
+export async function updateLeaveSettlement(id: number, data: Partial<typeof leaveSettlements.$inferInsert>) {
+  const result = await db.update(leaveSettlements).set(data).where(eq(leaveSettlements.id, id)).returning();
+  return result[0];
+}
+
+export async function deleteLeaveSettlement(id: number) {
+  await db.delete(leaveSettlements).where(eq(leaveSettlements.id, id));
 }
 

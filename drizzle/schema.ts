@@ -133,3 +133,37 @@ export const revenues = pgTable("revenues", {
 export type Revenue = typeof revenues.$inferSelect;
 export type InsertRevenue = typeof revenues.$inferInsert;
 
+
+/**
+ * جدول تصفية الإجازات
+ */
+export const ticketsEntitlementEnum = pgEnum('tickets_entitlement', ['employee', 'family4']);
+
+export const leaveSettlements = pgTable("leaveSettlements", {
+  id: serial("id").primaryKey(),
+  employeeId: integer("employeeId").notNull(),
+  joinDate: timestamp("joinDate").notNull(),
+  leaveStartDate: timestamp("leaveStartDate").notNull(),
+  leaveEndDate: timestamp("leaveEndDate"),
+  leaveDays: integer("leaveDays"),
+  previousBalanceDays: integer("previousBalanceDays").notNull().default(0),
+  ticketsEntitlement: ticketsEntitlementEnum("ticketsEntitlement").notNull().default('employee'),
+  visasCount: integer("visasCount").notNull().default(0),
+  deductionsAmount: integer("deductionsAmount").notNull().default(0),
+  
+  // الحسابات المحسوبة
+  serviceDays: integer("serviceDays").notNull().default(0),
+  accruedDays: integer("accruedDays").notNull().default(0),
+  balanceBeforeDeduction: integer("balanceBeforeDeduction").notNull().default(0),
+  currentLeaveDays: integer("currentLeaveDays").notNull().default(0),
+  balanceAfterDeduction: integer("balanceAfterDeduction").notNull().default(0),
+  ticketsCount: integer("ticketsCount").notNull().default(0),
+  netPayable: integer("netPayable").notNull().default(0),
+  
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type LeaveSettlement = typeof leaveSettlements.$inferSelect;
+export type InsertLeaveSettlement = typeof leaveSettlements.$inferInsert;
+
