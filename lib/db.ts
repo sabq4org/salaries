@@ -5,7 +5,7 @@ import * as schema from "../drizzle/schema";
 
 const { employees, contractors, employeePayrolls, contractorPayrolls, expenses } = schema;
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
 const client = postgres(connectionString, { prepare: false });
 export const db = drizzle(client, { schema });
 
