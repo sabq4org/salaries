@@ -35,7 +35,7 @@ interface Payroll {
   year: number;
   month: number;
   baseSalary: number;
-  allowance: number;
+  socialInsurance: number;
   deduction: number;
   bonus: number;
   netSalary: number;
@@ -59,7 +59,7 @@ export default function PayrollPage() {
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     baseSalary: 0,
-    allowance: 0,
+    socialInsurance: 0,
     deduction: 0,
     bonus: 0,
   });
@@ -102,8 +102,8 @@ export default function PayrollPage() {
   };
 
   const calculateNetSalary = () => {
-    const { baseSalary, allowance, deduction, bonus } = formData;
-    return baseSalary + allowance - deduction + bonus;
+    const { baseSalary, socialInsurance, deduction, bonus } = formData;
+    return baseSalary + socialInsurance - deduction + bonus;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -141,7 +141,7 @@ export default function PayrollPage() {
       year: item.year,
       month: item.month,
       baseSalary: item.baseSalary,
-      allowance: item.allowance,
+      socialInsurance: item.socialInsurance,
       deduction: item.deduction,
       bonus: item.bonus,
     });
@@ -169,7 +169,7 @@ export default function PayrollPage() {
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       baseSalary: 0,
-      allowance: 0,
+      socialInsurance: 0,
       deduction: 0,
       bonus: 0,
     });
@@ -276,12 +276,12 @@ export default function PayrollPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="allowance">البدلات</Label>
+                  <Label htmlFor="socialInsurance">التأمينات الاجتماعية</Label>
                   <Input
-                    id="allowance"
+                    id="socialInsurance"
                     type="number"
-                    value={formData.allowance}
-                    onChange={(e) => setFormData({ ...formData, allowance: parseInt(e.target.value) || 0 })}
+                    value={formData.socialInsurance}
+                    onChange={(e) => setFormData({ ...formData, socialInsurance: parseInt(e.target.value) || 0 })}
                   />
                 </div>
 
@@ -362,7 +362,7 @@ export default function PayrollPage() {
                 <tr className="border-b">
                   <th className="text-right p-2">الموظف</th>
                   <th className="text-right p-2">الراتب الأساسي</th>
-                  <th className="text-right p-2">البدلات</th>
+                  <th className="text-right p-2">التأمينات الاجتماعية</th>
                   <th className="text-right p-2">المكافآت</th>
                   <th className="text-right p-2">الخصومات</th>
                   <th className="text-right p-2">صافي الراتب</th>
@@ -374,7 +374,7 @@ export default function PayrollPage() {
                   <tr key={item.id} className="border-b">
                     <td className="p-2">{item.employeeName}</td>
                     <td className="p-2">{item.baseSalary.toLocaleString()} ر.س</td>
-                    <td className="p-2">{item.allowance.toLocaleString()} ر.س</td>
+                    <td className="p-2">{item.socialInsurance.toLocaleString()} ر.س</td>
                     <td className="p-2">{item.bonus.toLocaleString()} ر.س</td>
                     <td className="p-2 text-red-600">{item.deduction.toLocaleString()} ر.س</td>
                     <td className="p-2 font-semibold">{item.netSalary.toLocaleString()} ر.س</td>
@@ -395,7 +395,7 @@ export default function PayrollPage() {
                 <tr className="border-t-2 font-bold">
                   <td className="p-2">الإجمالي</td>
                   <td className="p-2">{payroll.reduce((sum, item) => sum + item.baseSalary, 0).toLocaleString()} ر.س</td>
-                  <td className="p-2">{payroll.reduce((sum, item) => sum + item.allowance, 0).toLocaleString()} ر.س</td>
+                  <td className="p-2">{payroll.reduce((sum, item) => sum + item.socialInsurance, 0).toLocaleString()} ر.س</td>
                   <td className="p-2">{payroll.reduce((sum, item) => sum + item.bonus, 0).toLocaleString()} ر.س</td>
                   <td className="p-2 text-red-600">{payroll.reduce((sum, item) => sum + item.deduction, 0).toLocaleString()} ر.س</td>
                   <td className="p-2 text-blue-600">{payroll.reduce((sum, item) => sum + item.netSalary, 0).toLocaleString()} ر.س</td>

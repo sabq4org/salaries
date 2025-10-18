@@ -29,9 +29,8 @@ const menuItems = [
   { icon: FileText, label: "التقارير", href: "/reports" },
 ];
 
-const bottomMenuItems = [
-  { icon: Settings, label: "الإعدادات", href: "/settings" },
-  { icon: HelpCircle, label: "المساعدة", href: "/help" },
+const bottomMenuItems: any[] = [
+  // يمكن إضافة روابط إضافية هنا لاحقاً
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -87,23 +86,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </nav>
 
-          {/* Bottom Menu */}
-          <div 
-            className="px-3 py-4 space-y-1"
-            style={{ borderTop: '1px solid #f0f0ef' }}
-          >
-            {bottomMenuItems.map((item) => (
-              <SidebarLink
-                key={item.href}
-                href={item.href}
-                icon={item.icon}
-                active={pathname === item.href}
-                onClick={onClose}
-              >
-                {item.label}
-              </SidebarLink>
-            ))}
-          </div>
+          {/* Bottom Menu - Hidden for now */}
+          {bottomMenuItems.length > 0 && (
+            <div 
+              className="px-3 py-4 space-y-1"
+              style={{ borderTop: '1px solid #f0f0ef' }}
+            >
+              {bottomMenuItems.map((item) => (
+                <SidebarLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  active={pathname === item.href}
+                  onClick={onClose}
+                >
+                  {item.label}
+                </SidebarLink>
+              ))}
+            </div>
+          )}
 
           {/* User Info */}
           <div 
