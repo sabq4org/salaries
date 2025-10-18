@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck } from "lucide-react";
+import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 interface EmployeePayroll {
@@ -129,10 +129,13 @@ export default function PayrollPage() {
       const url = editingEmployeeId ? `/api/payroll?id=${editingEmployeeId}` : '/api/payroll';
       const method = editingEmployeeId ? 'PUT' : 'POST';
       
+      // Calculate net salary
+      const netSalary = employeeFormData.baseSalary - employeeFormData.socialInsurance - employeeFormData.deduction + employeeFormData.bonus;
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(employeeFormData),
+        body: JSON.stringify({ ...employeeFormData, netSalary }),
       });
 
       if (!response.ok) throw new Error('Failed to save employee payroll');
@@ -153,10 +156,13 @@ export default function PayrollPage() {
       const url = editingContractorId ? `/api/contractor-payroll?id=${editingContractorId}` : '/api/contractor-payroll';
       const method = editingContractorId ? 'PUT' : 'POST';
       
+      // Calculate net salary
+      const netSalary = contractorFormData.salary - contractorFormData.deduction + contractorFormData.bonus;
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contractorFormData),
+        body: JSON.stringify({ ...contractorFormData, netSalary }),
       });
 
       if (!response.ok) throw new Error('Failed to save contractor payroll');
@@ -203,6 +209,7 @@ export default function PayrollPage() {
 
   const totalEmployeeSalaries = employeePayrolls.reduce((sum, p) => sum + p.netSalary, 0);
   const totalContractorSalaries = contractorPayrolls.reduce((sum, p) => sum + p.netSalary, 0);
+  const totalSocialInsurance = employeePayrolls.reduce((sum, p) => sum + p.socialInsurance, 0);
   const grandTotal = totalEmployeeSalaries + totalContractorSalaries;
 
   const months = [
@@ -245,7 +252,7 @@ export default function PayrollPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -278,6 +285,18 @@ export default function PayrollPage() {
               <div>
                 <p className="text-sm text-gray-600">الإجمالي الشامل</p>
                 <p className="text-2xl font-bold text-gray-900">{grandTotal.toLocaleString()} ر.س</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <Shield className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">مجموع التأمينات</p>
+                <p className="text-2xl font-bold text-gray-900">{totalSocialInsurance.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
