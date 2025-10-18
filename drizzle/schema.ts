@@ -1,14 +1,16 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
+import { pgTable, serial, text, varchar, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
 
 /**
  * جدول المستخدمين
  */
-export const users = mysqlTable("users", {
+export const userRoleEnum = pgEnum('user_role', ['user', 'admin']);
+
+export const users = pgTable("users", {
   id: varchar("id", { length: 64 }).primaryKey(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: userRoleEnum("role").default('user').notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
 });
@@ -19,15 +21,15 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * جدول الموظفين الرسميين
  */
-export const employees = mysqlTable("employees", {
-  id: int("id").primaryKey().autoincrement(),
+export const employees = pgTable("employees", {
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   position: varchar("position", { length: 255 }),
-  baseSalary: int("baseSalary").notNull().default(0),
-  socialInsurance: int("socialInsurance").notNull().default(0),
+  baseSalary: integer("baseSalary").notNull().default(0),
+  socialInsurance: integer("socialInsurance").notNull().default(0),
   isActive: boolean("isActive").notNull().default(true),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type Employee = typeof employees.$inferSelect;
@@ -36,73 +38,72 @@ export type InsertEmployee = typeof employees.$inferInsert;
 /**
  * جدول المتعاونين
  */
-export const contractors = mysqlTable("contractors", {
-  id: int("id").primaryKey().autoincrement(),
+export const contractors = pgTable("contractors", {
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   position: varchar("position", { length: 255 }),
-  salary: int("salary").notNull().default(0),
+  salary: integer("salary").notNull().default(0),
   isActive: boolean("isActive").notNull().default(true),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type Contractor = typeof contractors.$inferSelect;
 export type InsertContractor = typeof contractors.$inferInsert;
 
 /**
- * جدول سجلات الرواتب الشهرية للموظفين
+ * جدول مسير رواتب الموظفين الرسميين
  */
-export const employeePayrolls = mysqlTable("employeePayrolls", {
-  id: int("id").primaryKey().autoincrement(),
-  employeeId: int("employeeId").notNull(),
-  month: int("month").notNull(), // 1-12
-  year: int("year").notNull(),
-  baseSalary: int("baseSalary").notNull().default(0),
-  socialInsurance: int("socialInsurance").notNull().default(0),
-  deduction: int("deduction").notNull().default(0),
-  bonus: int("bonus").notNull().default(0),
-  netSalary: int("netSalary").notNull().default(0),
-  notes: text("notes"),
+export const employeePayrolls = pgTable("employeePayrolls", {
+  id: serial("id").primaryKey(),
+  employeeId: integer("employeeId").notNull(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(),
+  baseSalary: integer("baseSalary").notNull().default(0),
+  socialInsurance: integer("socialInsurance").notNull().default(0),
+  deduction: integer("deduction").notNull().default(0),
+  bonus: integer("bonus").notNull().default(0),
+  netSalary: integer("netSalary").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type EmployeePayroll = typeof employeePayrolls.$inferSelect;
 export type InsertEmployeePayroll = typeof employeePayrolls.$inferInsert;
 
 /**
- * جدول سجلات الرواتب الشهرية للمتعاونين
+ * جدول مسير رواتب المتعاونين
  */
-export const contractorPayrolls = mysqlTable("contractorPayrolls", {
-  id: int("id").primaryKey().autoincrement(),
-  contractorId: int("contractorId").notNull(),
-  month: int("month").notNull(), // 1-12
-  year: int("year").notNull(),
-  salary: int("salary").notNull().default(0),
-  deduction: int("deduction").notNull().default(0),
-  bonus: int("bonus").notNull().default(0),
-  netSalary: int("netSalary").notNull().default(0),
-  notes: text("notes"),
+export const contractorPayrolls = pgTable("contractorPayrolls", {
+  id: serial("id").primaryKey(),
+  contractorId: integer("contractorId").notNull(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(),
+  salary: integer("salary").notNull().default(0),
+  deduction: integer("deduction").notNull().default(0),
+  bonus: integer("bonus").notNull().default(0),
+  netSalary: integer("netSalary").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type ContractorPayroll = typeof contractorPayrolls.$inferSelect;
 export type InsertContractorPayroll = typeof contractorPayrolls.$inferInsert;
 
 /**
- * جدول بنود المصروفات
+ * جدول المصروفات والميزانية
  */
-export const expenses = mysqlTable("expenses", {
-  id: int("id").primaryKey().autoincrement(),
-  category: varchar("category", { length: 255 }).notNull(),
-  plannedBudget: int("plannedBudget").notNull().default(0),
-  actualExpense: int("actualExpense").notNull().default(0),
-  month: int("month").notNull(), // 1-12
-  year: int("year").notNull(),
-  notes: text("notes"),
+export const expenseTypeEnum = pgEnum('expense_type', ['salary', 'operational', 'marketing', 'other']);
+
+export const expenses = pgTable("expenses", {
+  id: serial("id").primaryKey(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(),
+  type: expenseTypeEnum("type").notNull(),
+  description: text("description"),
+  amount: integer("amount").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type Expense = typeof expenses.$inferSelect;
