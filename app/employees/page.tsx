@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     position: "",
@@ -56,22 +57,37 @@ export default function EmployeesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/employees', {
-        method: 'POST',
+      const url = editingId ? `/api/employees?id=${editingId}` : '/api/employees';
+      const method = editingId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Failed to create employee');
+      if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} employee`);
       
-      toast.success('تم إضافة الموظف بنجاح');
+      toast.success(editingId ? 'تم تحديث الموظف بنجاح' : 'تم إضافة الموظف بنجاح');
       setOpen(false);
+      setEditingId(null);
       setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
       fetchEmployees();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('فشل في إضافة الموظف');
+      toast.error(editingId ? 'فشل في تحديث الموظف' : 'فشل في إضافة الموظف');
     }
+  };
+
+  const handleEdit = (employee: Employee) => {
+    setEditingId(employee.id);
+    setFormData({
+      name: employee.name,
+      position: employee.position || "",
+      baseSalary: employee.baseSalary,
+      socialInsurance: employee.socialInsurance,
+    });
+    setOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -89,11 +105,19 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleDialogClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setEditingId(null);
+      setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">الموظفون الرسميون</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="ml-2" size={20} />
@@ -102,7 +126,7 @@ export default function EmployeesPage() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>إضافة موظف جديد</DialogTitle>
+              <DialogTitle>{editingId ? 'تعديل بيانات الموظف' : 'إضافة موظف جديد'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -146,10 +170,10 @@ export default function EmployeesPage() {
                 />
               </div>
               <div className="flex gap-2 justify-end">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
                   إلغاء
                 </Button>
-                <Button type="submit">حفظ</Button>
+                <Button type="submit">{editingId ? 'تحديث' : 'حفظ'}</Button>
               </div>
             </form>
           </DialogContent>
@@ -183,7 +207,7 @@ export default function EmployeesPage() {
                     <td className="p-2">{emp.socialInsurance.toLocaleString()} ر.س</td>
                     <td className="p-2">
                       <div className="flex gap-2">
-                        <Button size="sm" variant="ghost">
+                        <Button size="sm" variant="ghost" onClick={() => handleEdit(emp)}>
                           <Pencil size={16} />
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => handleDelete(emp.id)}>
