@@ -178,7 +178,7 @@ export default function BudgetPage() {
         <h1 className="text-3xl font-bold">الميزانية السنوية</h1>
         <Dialog open={open} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
-            <Button>
+            <Button style={{ backgroundColor: "#2563eb" }} className="text-white">
               <Plus className="ml-2" size={20} />
               إضافة مصروف
             </Button>
@@ -285,7 +285,7 @@ export default function BudgetPage() {
             className="w-[120px]"
           />
         </div>
-      </Card>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -297,7 +297,7 @@ export default function BudgetPage() {
             </div>
             <TrendingDown size={40} className="text-red-200" />
           </div>
-        </Card>
+        </div>
 
         {getExpensesByType().slice(0, 3).map((type, index) => (
           <Card key={type.value} className="p-6">
@@ -308,7 +308,7 @@ export default function BudgetPage() {
               </div>
               <TrendingUp size={40} className="text-gray-400" />
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
@@ -332,7 +332,7 @@ export default function BudgetPage() {
             );
           })}
         </div>
-      </Card>
+      </div>
 
       {/* Expenses Table */}
       <Card className="p-6">
@@ -378,7 +378,7 @@ export default function BudgetPage() {
             </table>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

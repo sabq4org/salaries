@@ -196,12 +196,13 @@ export default function PayrollPage() {
   };
 
   return (
+    <DashboardLayout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">مسير الرواتب الشهرية</h1>
         <Dialog open={open} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
-            <Button>
+            <Button style={{ backgroundColor: "#2563eb" }} className="text-white">
               <Plus className="ml-2" size={20} />
               إضافة راتب جديد
             </Button>
@@ -350,7 +351,7 @@ export default function PayrollPage() {
             className="w-[120px]"
           />
         </div>
-      </Card>
+      </div>
 
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-4">سجلات الرواتب</h2>
@@ -408,7 +409,7 @@ export default function PayrollPage() {
             </table>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
