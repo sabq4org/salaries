@@ -65,7 +65,10 @@ export async function getContractorPayrolls() {
 }
 
 // Expenses
-export async function getAllExpenses() {
+export async function getAllExpenses(year?: number) {
+  if (year) {
+    return await db.select().from(expenses).where(eq(expenses.year, year));
+  }
   return await db.select().from(expenses);
 }
 

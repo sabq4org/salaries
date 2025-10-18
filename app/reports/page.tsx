@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText, Download, Users, DollarSign, TrendingUp, Calendar } from "lucide-react";
-import { toast } from "sonner";
 
 interface ReportData {
   employees: any[];
@@ -35,6 +34,7 @@ export default function ReportsPage() {
     expenses: [],
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
@@ -44,12 +44,20 @@ export default function ReportsPage() {
 
   const fetchAllData = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
       const [employeesRes, contractorsRes, payrollRes, expensesRes] = await Promise.all([
         fetch('/api/employees'),
         fetch('/api/contractors'),
         fetch(`/api/payroll?year=${selectedYear}&month=${selectedMonth}`),
         fetch(`/api/expenses?year=${selectedYear}`),
       ]);
+
+      // Check if all responses are ok
+      if (!employeesRes.ok || !contractorsRes.ok || !payrollRes.ok || !expensesRes.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
       const [employees, contractors, payroll, expenses] = await Promise.all([
         employeesRes.json(),
@@ -58,22 +66,27 @@ export default function ReportsPage() {
         expensesRes.json(),
       ]);
 
-      setData({ employees, contractors, payroll, expenses });
+      setData({ 
+        employees: employees || [], 
+        contractors: contractors || [], 
+        payroll: payroll || [], 
+        expenses: expenses || [] 
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('فشل في تحميل البيانات');
+      setError('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
     }
   };
 
   const calculateStats = () => {
-    const totalEmployees = data.employees.length;
-    const totalContractors = data.contractors.length;
-    const monthlyPayroll = data.payroll.reduce((sum, p) => sum + p.netSalary, 0);
-    const yearlyExpenses = data.expenses.reduce((sum, e) => sum + e.amount, 0);
-    const averageSalary = data.employees.length > 0
-      ? data.employees.reduce((sum, e) => sum + e.baseSalary, 0) / data.employees.length
+    const totalEmployees = data.employees?.length || 0;
+    const totalContractors = data.contractors?.length || 0;
+    const monthlyPayroll = data.payroll?.reduce((sum, p) => sum + (p.netSalary || 0), 0) || 0;
+    const yearlyExpenses = data.expenses?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0;
+    const averageSalary = data.employees?.length > 0
+      ? data.employees.reduce((sum, e) => sum + (e.baseSalary || 0), 0) / data.employees.length
       : 0;
 
     return {
@@ -99,69 +112,39 @@ export default function ReportsPage() {
 📊 ملخص الإحصائيات:
 - عدد الموظفين الرسميين: ${stats.totalEmployees}
 - عدد المتعاونين: ${stats.totalContractors}
-- إجمالي الرواتب الشهرية: ${stats.monthlyPayroll.toLocaleString()} ريال
-- إجمالي المصروفات السنوية: ${stats.yearlyExpenses.toLocaleString()} ريال
-- متوسط الراتب: ${Math.round(stats.averageSalary).toLocaleString()} ريال
+- الرواتب الشهرية: ${stats.monthlyPayroll.toLocaleString()} ر.س
+- المصروفات السنوية: ${stats.yearlyExpenses.toLocaleString()} ر.س
+- متوسط الراتب: ${Math.round(stats.averageSalary).toLocaleString()} ر.س
 
 ===========================================
 
 👥 الموظفون الرسميون:
-${data.employees.map((emp, i) => `
-${i + 1}. ${emp.name}
-   المنصب: ${emp.position || '-'}
-   الراتب الأساسي: ${emp.baseSalary.toLocaleString()} ريال
-   التأمينات: ${emp.socialInsurance.toLocaleString()} ريال
-`).join('')}
+${data.employees?.map((e, i) => `${i + 1}. ${e.name} - ${e.position} - ${e.baseSalary?.toLocaleString()} ر.س`).join('\n') || 'لا توجد بيانات'}
 
 ===========================================
 
 🤝 المتعاونون:
-${data.contractors.map((con, i) => `
-${i + 1}. ${con.name}
-   المنصب: ${con.position || '-'}
-   الراتب: ${con.salary.toLocaleString()} ريال
-`).join('')}
+${data.contractors?.map((c, i) => `${i + 1}. ${c.name} - ${c.position} - ${c.salary?.toLocaleString()} ر.س`).join('\n') || 'لا توجد بيانات'}
 
 ===========================================
 
-💰 مسير الرواتب - ${MONTHS[selectedMonth - 1]} ${selectedYear}:
-${data.payroll.map((p, i) => {
-  const emp = data.employees.find(e => e.id === p.employeeId);
-  return `
-${i + 1}. ${emp?.name || 'غير معروف'}
-   الراتب الأساسي: ${p.baseSalary.toLocaleString()} ريال
-   البدلات: ${p.allowance.toLocaleString()} ريال
-   المكافآت: ${p.bonus.toLocaleString()} ريال
-   الخصومات: ${p.deduction.toLocaleString()} ريال
-   صافي الراتب: ${p.netSalary.toLocaleString()} ريال
+💰 مسير الرواتب لشهر ${MONTHS[selectedMonth - 1]} ${selectedYear}:
+${data.payroll?.map((p, i) => {
+  const employee = data.employees?.find(e => e.id === p.employeeId);
+  return `${i + 1}. ${employee?.name || 'غير معروف'} - صافي الراتب: ${p.netSalary?.toLocaleString()} ر.س`;
+}).join('\n') || 'لا توجد بيانات'}
+
+===========================================
+
+📊 المصروفات السنوية ${selectedYear}:
+${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amount?.toLocaleString()} ر.س (${MONTHS[e.month - 1]})`).join('\n') || 'لا توجد بيانات'}
+
+===========================================
+
+إجمالي المصروفات: ${stats.yearlyExpenses.toLocaleString()} ر.س
 `;
-}).join('')}
 
-إجمالي الرواتب: ${stats.monthlyPayroll.toLocaleString()} ريال
-
-===========================================
-
-📈 المصروفات - ${selectedYear}:
-${data.expenses.map((exp, i) => `
-${i + 1}. ${MONTHS[exp.month - 1]} - ${exp.type}
-   المبلغ: ${exp.amount.toLocaleString()} ريال
-   ${exp.description ? `الوصف: ${exp.description}` : ''}
-`).join('')}
-
-إجمالي المصروفات: ${stats.yearlyExpenses.toLocaleString()} ريال
-
-===========================================
-
-تم إنشاء التقرير بواسطة نظام الميزانية والرواتب
-صحيفة سبق
-    `.trim();
-
-    return reportContent;
-  };
-
-  const downloadReport = () => {
-    const report = generateReport();
-    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -170,202 +153,299 @@ ${i + 1}. ${MONTHS[exp.month - 1]} - ${exp.type}
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('تم تحميل التقرير بنجاح');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="p-6 max-w-md">
+          <div className="text-center text-red-600">
+            <FileText className="h-12 w-12 mx-auto mb-4" />
+            <p className="text-lg font-semibold mb-2">خطأ في تحميل التقرير</p>
+            <p className="text-sm mb-4">{error}</p>
+            <Button onClick={fetchAllData}>إعادة المحاولة</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const stats = calculateStats();
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto p-6 max-w-7xl" dir="rtl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">التقارير</h1>
-        <Button onClick={downloadReport}>
-          <Download className="ml-2" size={20} />
+        <Button onClick={generateReport} className="gap-2">
+          <Download className="h-4 w-4" />
           تحميل التقرير
         </Button>
       </div>
 
       {/* Filters */}
       <Card className="p-4 mb-6">
-        <div className="flex items-center gap-4">
-          <Calendar size={20} className="text-gray-600" />
-          <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTHS.map((month, index) => (
-                <SelectItem key={index} value={(index + 1).toString()}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            type="number"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value) || new Date().getFullYear())}
-            className="w-[120px]"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>الشهر</Label>
+            <Select
+              value={selectedMonth.toString()}
+              onValueChange={(value) => setSelectedMonth(parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTHS.map((month, index) => (
+                  <SelectItem key={index} value={(index + 1).toString()}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>السنة</Label>
+            <Input
+              type="number"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              min="2020"
+              max="2030"
+            />
+          </div>
         </div>
       </Card>
 
-      {loading ? (
-        <p>جاري التحميل...</p>
-      ) : (
-        <>
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm mb-1">الموظفون</p>
-                  <p className="text-3xl font-bold">{stats.totalEmployees}</p>
-                </div>
-                <Users size={40} className="text-blue-200" />
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm mb-1">المتعاونون</p>
-                  <p className="text-3xl font-bold">{stats.totalContractors}</p>
-                </div>
-                <Users size={40} className="text-green-200" />
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm mb-1">الرواتب الشهرية</p>
-                  <p className="text-2xl font-bold">{stats.monthlyPayroll.toLocaleString()} ر.س</p>
-                </div>
-                <DollarSign size={40} className="text-purple-200" />
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm mb-1">المصروفات السنوية</p>
-                  <p className="text-2xl font-bold">{stats.yearlyExpenses.toLocaleString()} ر.س</p>
-                </div>
-                <TrendingUp size={40} className="text-orange-200" />
-              </div>
-            </Card>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <Users className="h-8 w-8 text-blue-600" />
+            <div>
+              <p className="text-sm text-gray-600">الموظفون</p>
+              <p className="text-2xl font-bold">{stats.totalEmployees}</p>
+            </div>
           </div>
+        </Card>
 
-          {/* Detailed Reports */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Employees Report */}
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Users size={20} />
-                الموظفون الرسميون
-              </h2>
-              <div className="space-y-3">
-                {data.employees.slice(0, 5).map((emp) => (
-                  <div key={emp.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                    <div>
-                      <p className="font-medium">{emp.name}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{emp.position || '-'}</p>
-                    </div>
-                    <p className="font-semibold">{emp.baseSalary.toLocaleString()} ر.س</p>
-                  </div>
-                ))}
-                {data.employees.length > 5 && (
-                  <p className="text-sm text-gray-600 text-center">و {data.employees.length - 5} موظف آخر...</p>
-                )}
-              </div>
-            </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <Users className="h-8 w-8 text-green-600" />
+            <div>
+              <p className="text-sm text-gray-600">المتعاونون</p>
+              <p className="text-2xl font-bold">{stats.totalContractors}</p>
+            </div>
+          </div>
+        </Card>
 
-            {/* Contractors Report */}
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Users size={20} />
-                المتعاونون
-              </h2>
-              <div className="space-y-3">
-                {data.contractors.slice(0, 5).map((con) => (
-                  <div key={con.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                    <div>
-                      <p className="font-medium">{con.name}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{con.position || '-'}</p>
-                    </div>
-                    <p className="font-semibold">{con.salary.toLocaleString()} ر.س</p>
-                  </div>
-                ))}
-                {data.contractors.length > 5 && (
-                  <p className="text-sm text-gray-600 text-center">و {data.contractors.length - 5} متعاون آخر...</p>
-                )}
-              </div>
-            </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <DollarSign className="h-8 w-8 text-purple-600" />
+            <div>
+              <p className="text-sm text-gray-600">الرواتب الشهرية</p>
+              <p className="text-2xl font-bold">{stats.monthlyPayroll.toLocaleString()} ر.س</p>
+            </div>
+          </div>
+        </Card>
 
-            {/* Payroll Report */}
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <DollarSign size={20} />
-                مسير الرواتب - {MONTHS[selectedMonth - 1]}
-              </h2>
-              <div className="space-y-3">
-                {data.payroll.slice(0, 5).map((p) => {
-                  const emp = data.employees.find(e => e.id === p.employeeId);
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <TrendingUp className="h-8 w-8 text-red-600" />
+            <div>
+              <p className="text-sm text-gray-600">المصروفات السنوية</p>
+              <p className="text-2xl font-bold">{stats.yearlyExpenses.toLocaleString()} ر.س</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Employees Report */}
+      <Card className="p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          الموظفون الرسميون
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-right">#</th>
+                <th className="px-4 py-2 text-right">الاسم</th>
+                <th className="px-4 py-2 text-right">المنصب</th>
+                <th className="px-4 py-2 text-right">الراتب الأساسي</th>
+                <th className="px-4 py-2 text-right">التأمينات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.employees?.length > 0 ? (
+                data.employees.map((employee, index) => (
+                  <tr key={employee.id} className="border-b">
+                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2">{employee.name}</td>
+                    <td className="px-4 py-2">{employee.position}</td>
+                    <td className="px-4 py-2">{employee.baseSalary?.toLocaleString()} ر.س</td>
+                    <td className="px-4 py-2">{employee.socialInsurance?.toLocaleString()} ر.س</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                    لا توجد بيانات
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Contractors Report */}
+      <Card className="p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          المتعاونون
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-right">#</th>
+                <th className="px-4 py-2 text-right">الاسم</th>
+                <th className="px-4 py-2 text-right">المنصب</th>
+                <th className="px-4 py-2 text-right">الراتب</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.contractors?.length > 0 ? (
+                data.contractors.map((contractor, index) => (
+                  <tr key={contractor.id} className="border-b">
+                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2">{contractor.name}</td>
+                    <td className="px-4 py-2">{contractor.position}</td>
+                    <td className="px-4 py-2">{contractor.salary?.toLocaleString()} ر.س</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                    لا توجد بيانات
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Payroll Report */}
+      <Card className="p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <DollarSign className="h-5 w-5" />
+          مسير الرواتب - {MONTHS[selectedMonth - 1]} {selectedYear}
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-right">#</th>
+                <th className="px-4 py-2 text-right">الموظف</th>
+                <th className="px-4 py-2 text-right">الراتب الأساسي</th>
+                <th className="px-4 py-2 text-right">البدلات</th>
+                <th className="px-4 py-2 text-right">المكافآت</th>
+                <th className="px-4 py-2 text-right">الخصومات</th>
+                <th className="px-4 py-2 text-right">صافي الراتب</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.payroll?.length > 0 ? (
+                data.payroll.map((payroll, index) => {
+                  const employee = data.employees?.find(e => e.id === payroll.employeeId);
                   return (
-                    <div key={p.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                      <div>
-                        <p className="font-medium">{emp?.name || 'غير معروف'}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          الأساسي: {p.baseSalary.toLocaleString()} | الخصم: {p.deduction.toLocaleString()}
-                        </p>
-                      </div>
-                      <p className="font-semibold text-green-600">{p.netSalary.toLocaleString()} ر.س</p>
-                    </div>
+                    <tr key={payroll.id} className="border-b">
+                      <td className="px-4 py-2">{index + 1}</td>
+                      <td className="px-4 py-2">{employee?.name || 'غير معروف'}</td>
+                      <td className="px-4 py-2">{payroll.baseSalary?.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-2">{payroll.allowance?.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-2">{payroll.bonus?.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-2">{payroll.deduction?.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-2 font-bold">{payroll.netSalary?.toLocaleString()} ر.س</td>
+                    </tr>
                   );
-                })}
-                {data.payroll.length > 5 && (
-                  <p className="text-sm text-gray-600 text-center">و {data.payroll.length - 5} سجل آخر...</p>
-                )}
-                <div className="pt-3 border-t">
-                  <div className="flex justify-between items-center font-bold">
-                    <span>الإجمالي:</span>
-                    <span className="text-green-600">{stats.monthlyPayroll.toLocaleString()} ر.س</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
+                })
+              ) : (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    لا توجد بيانات لهذا الشهر
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
-            {/* Expenses Report */}
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <TrendingUp size={20} />
-                المصروفات - {selectedYear}
-              </h2>
-              <div className="space-y-3">
-                {data.expenses.slice(0, 5).map((exp) => (
-                  <div key={exp.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                    <div>
-                      <p className="font-medium">{MONTHS[exp.month - 1]}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{exp.type}</p>
-                    </div>
-                    <p className="font-semibold text-red-600">{exp.amount.toLocaleString()} ر.س</p>
-                  </div>
-                ))}
-                {data.expenses.length > 5 && (
-                  <p className="text-sm text-gray-600 text-center">و {data.expenses.length - 5} مصروف آخر...</p>
-                )}
-                <div className="pt-3 border-t">
-                  <div className="flex justify-between items-center font-bold">
-                    <span>الإجمالي:</span>
-                    <span className="text-red-600">{stats.yearlyExpenses.toLocaleString()} ر.س</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </>
-      )}
+      {/* Expenses Report */}
+      <Card className="p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          المصروفات السنوية - {selectedYear}
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-right">#</th>
+                <th className="px-4 py-2 text-right">الشهر</th>
+                <th className="px-4 py-2 text-right">النوع</th>
+                <th className="px-4 py-2 text-right">الوصف</th>
+                <th className="px-4 py-2 text-right">المبلغ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.expenses?.length > 0 ? (
+                data.expenses.map((expense, index) => (
+                  <tr key={expense.id} className="border-b">
+                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2">{MONTHS[expense.month - 1]}</td>
+                    <td className="px-4 py-2">
+                      {expense.type === 'salary' ? 'رواتب' :
+                       expense.type === 'operational' ? 'تشغيلية' :
+                       expense.type === 'marketing' ? 'تسويق' : 'أخرى'}
+                    </td>
+                    <td className="px-4 py-2">{expense.description || '-'}</td>
+                    <td className="px-4 py-2 font-bold">{expense.amount?.toLocaleString()} ر.س</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                    لا توجد بيانات لهذه السنة
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            {data.expenses?.length > 0 && (
+              <tfoot className="bg-gray-50 font-bold">
+                <tr>
+                  <td colSpan={4} className="px-4 py-2 text-right">الإجمالي</td>
+                  <td className="px-4 py-2">{stats.yearlyExpenses.toLocaleString()} ر.س</td>
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
