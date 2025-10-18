@@ -30,9 +30,13 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ error: 'ID required' }, { status: 400 });
+    }
     const body = await request.json();
-    const { id, ...data } = body;
-    const employee = await updateEmployee(id, data);
+    const employee = await updateEmployee(parseInt(id), body);
     return NextResponse.json(employee);
   } catch (error) {
     console.error('PUT /api/employees error:', error);
