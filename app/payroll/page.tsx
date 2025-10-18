@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, DollarSign, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
-interface Payroll {
+interface EmployeePayroll {
   id: number;
   employeeId: number;
   employeeName?: string;
@@ -28,21 +28,45 @@ interface Payroll {
   netSalary: number;
 }
 
+interface ContractorPayroll {
+  id: number;
+  contractorId: number;
+  contractorName?: string;
+  year: number;
+  month: number;
+  salary: number;
+  deduction: number;
+  bonus: number;
+  netSalary: number;
+}
+
 interface Employee {
   id: number;
   name: string;
   baseSalary: number;
+  socialInsurance: number;
+}
+
+interface Contractor {
+  id: number;
+  name: string;
+  salary: number;
 }
 
 export default function PayrollPage() {
-  const [payroll, setPayroll] = useState<Payroll[]>([]);
+  const [employeePayrolls, setEmployeePayrolls] = useState<EmployeePayroll[]>([]);
+  const [contractorPayrolls, setContractorPayrolls] = useState<ContractorPayroll[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [contractors, setContractors] = useState<Contractor[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [openEmployee, setOpenEmployee] = useState(false);
+  const [openContractor, setOpenContractor] = useState(false);
+  const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(null);
+  const [editingContractorId, setEditingContractorId] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [formData, setFormData] = useState({
+  
+  const [employeeFormData, setEmployeeFormData] = useState({
     employeeId: 0,
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
@@ -51,290 +75,159 @@ export default function PayrollPage() {
     deduction: 0,
     bonus: 0,
   });
+  
+  const [contractorFormData, setContractorFormData] = useState({
+    contractorId: 0,
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    salary: 0,
+    deduction: 0,
+    bonus: 0,
+  });
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    fetchData();
+  }, [selectedYear, selectedMonth]);
 
-  useEffect(() => {
-    if (employees.length > 0) {
-      fetchPayroll();
-    }
-  }, [selectedYear, selectedMonth, employees]);
-
-  const fetchEmployees = async () => {
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/employees');
-      if (!response.ok) throw new Error('Failed to fetch employees');
-      const data = await response.json();
-      setEmployees(data);
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('فشل في تحميل الموظفين');
-    }
-  };
+      // Fetch employees
+      const empRes = await fetch('/api/employees');
+      const empData = await empRes.json();
+      setEmployees(empData);
 
-  const fetchPayroll = async () => {
-    try {
-      const response = await fetch(`/api/payroll?year=${selectedYear}&month=${selectedMonth}`);
-      if (!response.ok) throw new Error('Failed to fetch payroll');
-      const data = await response.json();
-      
-      const payrollWithNames = data.map((p: Payroll) => {
-        const employee = employees.find(e => e.id === p.employeeId);
-        return { ...p, employeeName: employee?.name || 'غير معروف' };
-      });
-      
-      setPayroll(payrollWithNames);
+      // Fetch contractors
+      const conRes = await fetch('/api/contractors');
+      const conData = await conRes.json();
+      setContractors(conData);
+
+      // Fetch employee payrolls
+      const empPayRes = await fetch(`/api/payroll?year=${selectedYear}&month=${selectedMonth}`);
+      const empPayData = await empPayRes.json();
+      const enrichedEmpPay = empPayData.map((p: any) => ({
+        ...p,
+        employeeName: empData.find((e: Employee) => e.id === p.employeeId)?.name || 'غير معروف',
+      }));
+      setEmployeePayrolls(enrichedEmpPay);
+
+      // Fetch contractor payrolls
+      const conPayRes = await fetch(`/api/contractor-payroll?year=${selectedYear}&month=${selectedMonth}`);
+      const conPayData = await conPayRes.json();
+      setContractorPayrolls(conPayData);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching data:', error);
       toast.error('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmployeeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const netSalary = formData.baseSalary - formData.socialInsurance - formData.deduction + formData.bonus;
-    
     try {
-      const url = editingId ? `/api/payroll?id=${editingId}` : '/api/payroll';
-      const method = editingId ? 'PUT' : 'POST';
+      const url = editingEmployeeId ? `/api/payroll?id=${editingEmployeeId}` : '/api/payroll';
+      const method = editingEmployeeId ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, netSalary }),
+        body: JSON.stringify(employeeFormData),
       });
 
-      if (!response.ok) throw new Error(`Failed to ${editingId ? 'update' : 'create'} payroll`);
-      
-      toast.success(editingId ? 'تم تحديث الراتب بنجاح' : 'تم إضافة الراتب بنجاح');
-      setOpen(false);
-      setEditingId(null);
-      setFormData({
-        employeeId: 0,
-        year: selectedYear,
-        month: selectedMonth,
-        baseSalary: 0,
-        socialInsurance: 0,
-        deduction: 0,
-        bonus: 0,
-      });
-      fetchPayroll();
+      if (!response.ok) throw new Error('Failed to save employee payroll');
+
+      toast.success(editingEmployeeId ? 'تم تحديث الراتب بنجاح' : 'تم إضافة الراتب بنجاح');
+      setOpenEmployee(false);
+      setEditingEmployeeId(null);
+      fetchData();
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(editingId ? 'فشل في تحديث الراتب' : 'فشل في إضافة الراتب');
+      console.error('Error saving employee payroll:', error);
+      toast.error('فشل في حفظ الراتب');
     }
   };
 
-  const handleEdit = (item: Payroll) => {
-    setEditingId(item.id);
-    setFormData({
-      employeeId: item.employeeId,
-      year: item.year,
-      month: item.month,
-      baseSalary: item.baseSalary,
-      socialInsurance: item.socialInsurance,
-      deduction: item.deduction,
-      bonus: item.bonus,
-    });
-    setOpen(true);
+  const handleContractorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const url = editingContractorId ? `/api/contractor-payroll?id=${editingContractorId}` : '/api/contractor-payroll';
+      const method = editingContractorId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contractorFormData),
+      });
+
+      if (!response.ok) throw new Error('Failed to save contractor payroll');
+
+      toast.success(editingContractorId ? 'تم تحديث الراتب بنجاح' : 'تم إضافة الراتب بنجاح');
+      setOpenContractor(false);
+      setEditingContractorId(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error saving contractor payroll:', error);
+      toast.error('فشل في حفظ الراتب');
+    }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('هل أنت متأكد من حذف هذا السجل؟')) return;
+  const handleDeleteEmployee = async (id: number) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الراتب؟')) return;
     
     try {
       const response = await fetch(`/api/payroll?id=${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete payroll');
+      if (!response.ok) throw new Error('Failed to delete');
       
-      toast.success('تم حذف السجل بنجاح');
-      fetchPayroll();
+      toast.success('تم حذف الراتب بنجاح');
+      fetchData();
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('فشل في حذف السجل');
+      console.error('Error deleting employee payroll:', error);
+      toast.error('فشل في حذف الراتب');
     }
   };
 
-  const handleDialogClose = (isOpen: boolean) => {
-    setOpen(isOpen);
-    if (!isOpen) {
-      setEditingId(null);
-      setFormData({
-        employeeId: 0,
-        year: selectedYear,
-        month: selectedMonth,
-        baseSalary: 0,
-        socialInsurance: 0,
-        deduction: 0,
-        bonus: 0,
-      });
+  const handleDeleteContractor = async (id: number) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الراتب؟')) return;
+    
+    try {
+      const response = await fetch(`/api/contractor-payroll?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete');
+      
+      toast.success('تم حذف الراتب بنجاح');
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting contractor payroll:', error);
+      toast.error('فشل في حذف الراتب');
     }
   };
 
-  const handleEmployeeChange = (employeeId: number) => {
-    const employee = employees.find(e => e.id === employeeId);
-    setFormData({
-      ...formData,
-      employeeId,
-      baseSalary: employee?.baseSalary || 0,
-    });
-  };
+  const totalEmployeeSalaries = employeePayrolls.reduce((sum, p) => sum + p.netSalary, 0);
+  const totalContractorSalaries = contractorPayrolls.reduce((sum, p) => sum + p.netSalary, 0);
+  const grandTotal = totalEmployeeSalaries + totalContractorSalaries;
 
   const months = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
   ];
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-xl">جاري التحميل...</div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">مسير الرواتب الشهرية</h1>
-            <p className="text-gray-600">إدارة وتتبع رواتب الموظفين الشهرية</p>
-          </div>
-          <Dialog open={open} onOpenChange={handleDialogClose}>
-            <DialogTrigger asChild>
-              <Button style={{ backgroundColor: '#2563eb' }} className="text-white">
-                <Plus className="ml-2" size={20} />
-                إضافة راتب جديد
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold">
-                  {editingId ? 'تعديل راتب' : 'إضافة راتب جديد'}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div>
-                  <Label htmlFor="employeeId">الموظف</Label>
-                  <select
-                    id="employeeId"
-                    value={formData.employeeId}
-                    onChange={(e) => handleEmployeeChange(parseInt(e.target.value))}
-                    required
-                    className="w-full mt-1 p-2 border rounded-md"
-                  >
-                    <option value={0}>اختر موظف</option>
-                    {employees.map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="year">السنة</Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || 0 })}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="month">الشهر</Label>
-                    <Input
-                      id="month"
-                      type="number"
-                      min="1"
-                      max="12"
-                      value={formData.month}
-                      onChange={(e) => setFormData({ ...formData, month: parseInt(e.target.value) || 0 })}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="baseSalary">الراتب الأساسي (ر.س)</Label>
-                  <Input
-                    id="baseSalary"
-                    type="number"
-                    value={formData.baseSalary}
-                    onChange={(e) => setFormData({ ...formData, baseSalary: parseInt(e.target.value) || 0 })}
-                    required
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="socialInsurance">التأمينات الاجتماعية (ر.س)</Label>
-                  <Input
-                    id="socialInsurance"
-                    type="number"
-                    value={formData.socialInsurance}
-                    onChange={(e) => setFormData({ ...formData, socialInsurance: parseInt(e.target.value) || 0 })}
-                    required
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="deduction">الخصومات (ر.س)</Label>
-                  <Input
-                    id="deduction"
-                    type="number"
-                    value={formData.deduction}
-                    onChange={(e) => setFormData({ ...formData, deduction: parseInt(e.target.value) || 0 })}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="bonus">المكافآت (ر.س)</Label>
-                  <Input
-                    id="bonus"
-                    type="number"
-                    value={formData.bonus}
-                    onChange={(e) => setFormData({ ...formData, bonus: parseInt(e.target.value) || 0 })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="p-4 rounded-lg" style={{ backgroundColor: '#f8f8f7' }}>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold">صافي الراتب:</span>
-                    <span className="text-xl font-bold text-green-600">
-                      {(formData.baseSalary - formData.socialInsurance - formData.deduction + formData.bonus).toLocaleString()} ر.س
-                    </span>
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" style={{ backgroundColor: '#2563eb' }} className="flex-1 text-white">
-                    {editingId ? 'حفظ التعديلات' : 'إضافة'}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
-                    إلغاء
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">مسير الرواتب الشهرية</h1>
+          <p className="text-gray-600 mt-2">إدارة رواتب الموظفين والمتعاونين</p>
         </div>
 
         {/* Month/Year Selector */}
-        <div className="mb-8 flex gap-4">
+        <div className="flex gap-4 items-center">
           <div>
             <Label>السنة</Label>
             <Input
               type="number"
               value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value) || new Date().getFullYear())}
-              className="mt-1"
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="w-32"
             />
           </div>
           <div>
@@ -342,7 +235,7 @@ export default function PayrollPage() {
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-              className="w-full mt-1 p-2 border rounded-md"
+              className="w-40 px-3 py-2 border border-gray-300 rounded-md"
             >
               {months.map((month, index) => (
                 <option key={index} value={index + 1}>{month}</option>
@@ -352,127 +245,324 @@ export default function PayrollPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">عدد السجلات</p>
-                <p className="text-3xl font-bold text-gray-900">{payroll.length}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <UserCheck className="w-6 h-6 text-blue-600" />
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
-              >
-                <Calendar className="h-6 w-6" />
+              <div>
+                <p className="text-sm text-gray-600">رواتب الموظفين</p>
+                <p className="text-2xl font-bold text-gray-900">{totalEmployeeSalaries.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
 
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {payroll.reduce((sum, p) => sum + p.netSalary, 0).toLocaleString()} ر.س
-                </p>
+          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Users className="w-6 h-6 text-green-600" />
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
-              >
-                <DollarSign className="h-6 w-6" />
+              <div>
+                <p className="text-sm text-gray-600">رواتب المتعاونين</p>
+                <p className="text-2xl font-bold text-gray-900">{totalContractorSalaries.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
 
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-          >
-            <div className="flex items-center justify-between">
+          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <DollarSign className="w-6 h-6 text-purple-600" />
+              </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">متوسط الراتب</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {payroll.length > 0 ? Math.round(payroll.reduce((sum, p) => sum + p.netSalary, 0) / payroll.length).toLocaleString() : 0} ر.س
-                </p>
+                <p className="text-sm text-gray-600">الإجمالي الشامل</p>
+                <p className="text-2xl font-bold text-gray-900">{grandTotal.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div 
-          className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
-                <tr>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الموظف</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب الأساسي</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">التأمينات</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الخصومات</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المكافآت</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">صافي الراتب</th>
-                  <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payroll.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="text-center p-8 text-gray-500">
-                      لا توجد سجلات لهذا الشهر
-                    </td>
-                  </tr>
-                ) : (
-                  payroll.map((item, index) => (
-                    <tr 
-                      key={item.id}
-                      style={{ 
-                        borderTop: '1px solid #f0f0ef',
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+        {/* Employee Payrolls Section */}
+        <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900">رواتب الموظفين الرسميين</h2>
+            <Dialog open={openEmployee} onOpenChange={setOpenEmployee}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 ml-2" />
+                  إضافة راتب موظف
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{editingEmployeeId ? 'تعديل راتب موظف' : 'إضافة راتب موظف جديد'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleEmployeeSubmit} className="space-y-4">
+                  <div>
+                    <Label>الموظف</Label>
+                    <select
+                      value={employeeFormData.employeeId}
+                      onChange={(e) => {
+                        const empId = parseInt(e.target.value);
+                        const emp = employees.find(e => e.id === empId);
+                        setEmployeeFormData({
+                          ...employeeFormData,
+                          employeeId: empId,
+                          baseSalary: emp?.baseSalary || 0,
+                          socialInsurance: emp?.socialInsurance || 0,
+                        });
                       }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      required
                     >
-                      <td className="p-4 text-gray-900 font-medium">{item.employeeName}</td>
-                      <td className="p-4 text-gray-900">{item.baseSalary.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{item.socialInsurance.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{item.deduction.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{item.bonus.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900 font-bold">{item.netSalary.toLocaleString()} ر.س</td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(item)}
-                            className="hover:bg-blue-50"
+                      <option value={0}>اختر موظف</option>
+                      {employees.map(emp => (
+                        <option key={emp.id} value={emp.id}>{emp.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>السنة</Label>
+                      <Input
+                        type="number"
+                        value={employeeFormData.year}
+                        onChange={(e) => setEmployeeFormData({ ...employeeFormData, year: parseInt(e.target.value) })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>الشهر</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={employeeFormData.month}
+                        onChange={(e) => setEmployeeFormData({ ...employeeFormData, month: parseInt(e.target.value) })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>الراتب الأساسي</Label>
+                    <Input
+                      type="number"
+                      value={employeeFormData.baseSalary}
+                      onChange={(e) => setEmployeeFormData({ ...employeeFormData, baseSalary: parseInt(e.target.value) })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>التأمينات الاجتماعية</Label>
+                    <Input
+                      type="number"
+                      value={employeeFormData.socialInsurance}
+                      onChange={(e) => setEmployeeFormData({ ...employeeFormData, socialInsurance: parseInt(e.target.value) })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>الخصومات</Label>
+                    <Input
+                      type="number"
+                      value={employeeFormData.deduction}
+                      onChange={(e) => setEmployeeFormData({ ...employeeFormData, deduction: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>المكافآت</Label>
+                    <Input
+                      type="number"
+                      value={employeeFormData.bonus}
+                      onChange={(e) => setEmployeeFormData({ ...employeeFormData, bonus: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">حفظ</Button>
+                    <Button type="button" variant="outline" onClick={() => setOpenEmployee(false)}>إلغاء</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {employeePayrolls.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">لا توجد بيانات لهذا الشهر</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f8f7' }}>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الموظف</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب الأساسي</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">التأمينات</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الخصومات</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المكافآت</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">صافي الراتب</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employeePayrolls.map((payroll) => (
+                    <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.employeeName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.baseSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.socialInsurance.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.bonus.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{payroll.netSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDeleteEmployee(payroll.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
-                            <Pencil className="h-4 w-4" style={{ color: '#2563eb' }} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(item.id)}
-                            className="hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" style={{ color: '#dc2626' }} />
-                          </Button>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Contractor Payrolls Section */}
+        <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900">رواتب المتعاونين</h2>
+            <Dialog open={openContractor} onOpenChange={setOpenContractor}>
+              <DialogTrigger asChild>
+                <Button className="bg-green-600 hover:bg-green-700">
+                  <Plus className="w-4 h-4 ml-2" />
+                  إضافة راتب متعاون
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{editingContractorId ? 'تعديل راتب متعاون' : 'إضافة راتب متعاون جديد'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleContractorSubmit} className="space-y-4">
+                  <div>
+                    <Label>المتعاون</Label>
+                    <select
+                      value={contractorFormData.contractorId}
+                      onChange={(e) => {
+                        const conId = parseInt(e.target.value);
+                        const con = contractors.find(c => c.id === conId);
+                        setContractorFormData({
+                          ...contractorFormData,
+                          contractorId: conId,
+                          salary: con?.salary || 0,
+                        });
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      required
+                    >
+                      <option value={0}>اختر متعاون</option>
+                      {contractors.map(con => (
+                        <option key={con.id} value={con.id}>{con.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>السنة</Label>
+                      <Input
+                        type="number"
+                        value={contractorFormData.year}
+                        onChange={(e) => setContractorFormData({ ...contractorFormData, year: parseInt(e.target.value) })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>الشهر</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={contractorFormData.month}
+                        onChange={(e) => setContractorFormData({ ...contractorFormData, month: parseInt(e.target.value) })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>الراتب</Label>
+                    <Input
+                      type="number"
+                      value={contractorFormData.salary}
+                      onChange={(e) => setContractorFormData({ ...contractorFormData, salary: parseInt(e.target.value) })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>الخصومات</Label>
+                    <Input
+                      type="number"
+                      value={contractorFormData.deduction}
+                      onChange={(e) => setContractorFormData({ ...contractorFormData, deduction: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>المكافآت</Label>
+                    <Input
+                      type="number"
+                      value={contractorFormData.bonus}
+                      onChange={(e) => setContractorFormData({ ...contractorFormData, bonus: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">حفظ</Button>
+                    <Button type="button" variant="outline" onClick={() => setOpenContractor(false)}>إلغاء</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
+
+          {contractorPayrolls.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">لا توجد بيانات لهذا الشهر</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f8f7' }}>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المتعاون</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الخصومات</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المكافآت</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">صافي الراتب</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contractorPayrolls.map((payroll) => (
+                    <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.contractorName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.salary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.bonus.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{payroll.netSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDeleteContractor(payroll.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
