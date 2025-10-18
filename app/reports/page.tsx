@@ -179,7 +179,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             <p className="text-sm mb-4">{error}</p>
             <Button onClick={fetchAllData}>إعادة المحاولة</Button>
           </div>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -228,7 +228,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -240,7 +240,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.totalEmployees}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.totalContractors}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -260,7 +260,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.monthlyPayroll.toLocaleString()} ر.س</p>
             </div>
           </div>
-        </div>
+        </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
               <p className="text-2xl font-bold">{stats.yearlyExpenses.toLocaleString()} ر.س</p>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Employees Report */}
@@ -311,7 +311,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Contractors Report */}
       <Card className="p-6 mb-6">
@@ -349,7 +349,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Payroll Report */}
       <Card className="p-6 mb-6">
@@ -396,7 +396,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Expenses Report */}
       <Card className="p-6">
@@ -448,7 +448,7 @@ ${data.expenses?.map((e, i) => `${i + 1}. ${e.description || e.type} - ${e.amoun
             )}
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
