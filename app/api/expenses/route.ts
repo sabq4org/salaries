@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result || []);
   } catch (error) {
     console.error('GET /api/expenses error:', error);
-    // Return empty array instead of error to prevent UI from breaking
     return NextResponse.json([]);
   }
 }
@@ -26,11 +25,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const result = await db.insert(expenses).values(body).returning();
+    console.log('POST /api/expenses - Received data:', body);
+    
+    // Validate required fields
+    if (!body.year || !body.month || !body.type || body.amount === undefined) {
+      return NextResponse.json(
+        { error: 'Missing required fields: year, month, type, amount' },
+        { status: 400 }
+      );
+    }
+    
+    // Ensure amount is a number
+    const expenseData = {
+      year: parseInt(body.year),
+      month: parseInt(body.month),
+      type: body.type,
+      description: body.description || null,
+      amount: parseInt(body.amount) || 0,
+    };
+    
+    console.log('POST /api/expenses - Inserting:', expenseData);
+    
+    const result = await db.insert(expenses).values(expenseData).returning();
+    
+    console.log('POST /api/expenses - Success:', result[0]);
+    
     return NextResponse.json(result[0], { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('POST /api/expenses error:', error);
-    return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 });
+    console.error('Error details:', error.message, error.stack);
+    return NextResponse.json(
+      { error: 'Failed to create expense', details: error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -42,9 +69,21 @@ export async function PUT(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
-
+    
     const body = await request.json();
-    const result = await db.update(expenses).set(body).where(eq(expenses.id, parseInt(id))).returning();
+    
+    const expenseData: any = {};
+    if (body.year !== undefined) expenseData.year = parseInt(body.year);
+    if (body.month !== undefined) expenseData.month = parseInt(body.month);
+    if (body.type !== undefined) expenseData.type = body.type;
+    if (body.description !== undefined) expenseData.description = body.description;
+    if (body.amount !== undefined) expenseData.amount = parseInt(body.amount);
+    
+    const result = await db.update(expenses)
+      .set(expenseData)
+      .where(eq(expenses.id, parseInt(id)))
+      .returning();
+      
     return NextResponse.json(result[0]);
   } catch (error) {
     console.error('PUT /api/expenses error:', error);
@@ -60,8 +99,9 @@ export async function DELETE(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
-
+    
     await db.delete(expenses).where(eq(expenses.id, parseInt(id)));
+    
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('DELETE /api/expenses error:', error);
