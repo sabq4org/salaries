@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+import StatsCard from "@/components/StatsCard";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { 
+  Users, 
+  UserCheck, 
+  DollarSign, 
+  TrendingUp,
+  ArrowRight,
+  FileText
+} from "lucide-react";
 import Link from "next/link";
-import { Users, UserCheck, Calendar, DollarSign, TrendingUp, FileText } from "lucide-react";
 
 interface Stats {
   totalEmployees: number;
@@ -13,7 +21,7 @@ interface Stats {
   averageSalary: number;
 }
 
-export default function Home() {
+export default function HomePage() {
   const [stats, setStats] = useState<Stats>({
     totalEmployees: 0,
     totalContractors: 0,
@@ -33,20 +41,22 @@ export default function Home() {
         fetch('/api/contractors'),
       ]);
 
-      if (employeesRes.ok && contractorsRes.ok) {
-        const employees = await employeesRes.json();
-        const contractors = await contractorsRes.json();
+      const employees = await employeesRes.json();
+      const contractors = await contractorsRes.json();
 
-        const totalSalaries = employees.reduce((sum: number, emp: any) => sum + emp.baseSalary, 0);
-        const averageSalary = employees.length > 0 ? Math.round(totalSalaries / employees.length) : 0;
+      const totalSalaries = employees.reduce((sum: number, e: any) => sum + (e.baseSalary || 0), 0) +
+                           contractors.reduce((sum: number, c: any) => sum + (c.salary || 0), 0);
+      
+      const averageSalary = employees.length > 0 
+        ? employees.reduce((sum: number, e: any) => sum + (e.baseSalary || 0), 0) / employees.length 
+        : 0;
 
-        setStats({
-          totalEmployees: employees.length,
-          totalContractors: contractors.length,
-          totalSalaries,
-          averageSalary,
-        });
-      }
+      setStats({
+        totalEmployees: employees.length,
+        totalContractors: contractors.length,
+        totalSalaries,
+        averageSalary: Math.round(averageSalary),
+      });
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -54,150 +64,124 @@ export default function Home() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <DollarSign className="text-white" size={24} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">نظام الميزانية والرواتب</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">صحيفة سبق</p>
-              </div>
-            </div>
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">جاري تحميل البيانات...</p>
           </div>
         </div>
-      </header>
+      </DashboardLayout>
+    );
+  }
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">مرحباً بك</h2>
-          <p className="text-gray-600 dark:text-gray-400">نظام إدارة شامل للرواتب والميزانية</p>
-        </div>
+  return (
+    <DashboardLayout>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          لوحة التحكم
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          نظرة عامة على الموظفين والرواتب والميزانية
+        </p>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm mb-1">الموظفون الرسميون</p>
-                <p className="text-3xl font-bold">{loading ? "..." : stats.totalEmployees}</p>
-              </div>
-              <Users size={40} className="text-blue-200" />
-            </div>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="الموظفون الرسميون"
+          value={stats.totalEmployees}
+          icon={Users}
+          color="blue"
+        />
+        <StatsCard
+          title="المتعاونون"
+          value={stats.totalContractors}
+          icon={UserCheck}
+          color="green"
+        />
+        <StatsCard
+          title="إجمالي الرواتب"
+          value={`${stats.totalSalaries.toLocaleString()} ر.س`}
+          icon={DollarSign}
+          color="purple"
+        />
+        <StatsCard
+          title="متوسط الراتب"
+          value={`${stats.averageSalary.toLocaleString()} ر.س`}
+          icon={TrendingUp}
+          color="orange"
+        />
+      </div>
 
-          <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm mb-1">المتعاونون</p>
-                <p className="text-3xl font-bold">{loading ? "..." : stats.totalContractors}</p>
-              </div>
-              <UserCheck size={40} className="text-green-200" />
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm mb-1">إجمالي الرواتب</p>
-                <p className="text-2xl font-bold">{loading ? "..." : stats.totalSalaries.toLocaleString()} ر.س</p>
-              </div>
-              <TrendingUp size={40} className="text-purple-200" />
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm mb-1">متوسط الراتب</p>
-                <p className="text-2xl font-bold">{loading ? "..." : stats.averageSalary.toLocaleString()} ر.س</p>
-              </div>
-              <DollarSign size={40} className="text-orange-200" />
-            </div>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link href="/employees">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                  <Users className="text-blue-600 dark:text-blue-400" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">الموظفون الرسميون</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">إدارة بيانات الموظفين</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-
-          <Link href="/contractors">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                  <UserCheck className="text-green-600 dark:text-green-400" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">المتعاونون</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">إدارة بيانات المتعاونين</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-
-          <Link href="/payroll">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                  <Calendar className="text-purple-600 dark:text-purple-400" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">مسير الرواتب</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">الرواتب الشهرية</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-
-          <Link href="/budget">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="text-orange-600 dark:text-orange-400" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">الميزانية السنوية</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">التقارير والإحصائيات</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-
-          <Link href="/reports">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
-                  <FileText className="text-indigo-600 dark:text-indigo-400" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">التقارير</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">تقارير مفصلة</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        </div>
-      </main>
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <SectionCard
+          href="/employees"
+          icon={Users}
+          title="الموظفون الرسميون"
+          description="إدارة بيانات الموظفين والرواتب والتأمينات"
+          color="blue"
+        />
+        <SectionCard
+          href="/contractors"
+          icon={UserCheck}
+          title="المتعاونون"
+          description="إدارة المتعاونين والمستقلين"
+          color="green"
+        />
+        <SectionCard
+          href="/payroll"
+          icon={DollarSign}
+          title="مسير الرواتب"
+          description="إنشاء وإدارة مسير الرواتب الشهرية"
+          color="purple"
+        />
+        <SectionCard
+          href="/budget"
+          icon={TrendingUp}
+          title="الميزانية السنوية"
+          description="تتبع المصروفات والميزانية السنوية"
+          color="orange"
+        />
+        <SectionCard
+          href="/reports"
+          icon={FileText}
+          title="التقارير"
+          description="عرض وتصدير التقارير المالية"
+          color="red"
+        />
+      </div>
+    </DashboardLayout>
   );
 }
 
+function SectionCard({ href, icon: Icon, title, description, color }: any) {
+  const colorClasses = {
+    blue: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+    green: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400",
+    purple: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400",
+    orange: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400",
+    red: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
+  };
+
+  return (
+    <Link href={href}>
+      <Card className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer group h-full">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${colorClasses[color as keyof typeof colorClasses]}`}>
+          <Icon className="h-6 w-6" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {title}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {description}
+        </p>
+        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm font-medium">
+          <span>عرض التفاصيل</span>
+          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </Card>
+    </Link>
+  );
+}
