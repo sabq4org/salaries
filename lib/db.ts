@@ -117,7 +117,34 @@ export async function deleteExpense(id: number) {
 
 // Leave Settlements
 export async function getAllLeaveSettlements() {
-  return await db.select().from(leaveSettlements).orderBy(leaveSettlements.createdAt);
+  const results = await db
+    .select({
+      id: leaveSettlements.id,
+      employeeId: leaveSettlements.employeeId,
+      employeeName: employees.name,
+      employeePosition: employees.position,
+      joinDate: leaveSettlements.joinDate,
+      leaveStartDate: leaveSettlements.leaveStartDate,
+      leaveEndDate: leaveSettlements.leaveEndDate,
+      leaveDays: leaveSettlements.leaveDays,
+      previousBalanceDays: leaveSettlements.previousBalanceDays,
+      ticketsEntitlement: leaveSettlements.ticketsEntitlement,
+      visasCount: leaveSettlements.visasCount,
+      deductionsAmount: leaveSettlements.deductionsAmount,
+      serviceDays: leaveSettlements.serviceDays,
+      accruedDays: leaveSettlements.accruedDays,
+      balanceBeforeDeduction: leaveSettlements.balanceBeforeDeduction,
+      currentLeaveDays: leaveSettlements.currentLeaveDays,
+      balanceAfterDeduction: leaveSettlements.balanceAfterDeduction,
+      ticketsCount: leaveSettlements.ticketsCount,
+      netPayable: leaveSettlements.netPayable,
+      createdAt: leaveSettlements.createdAt,
+    })
+    .from(leaveSettlements)
+    .leftJoin(employees, eq(leaveSettlements.employeeId, employees.id))
+    .orderBy(leaveSettlements.createdAt);
+  
+  return results;
 }
 
 export async function getLeaveSettlementsByEmployee(employeeId: number) {
