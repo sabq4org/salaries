@@ -317,9 +317,11 @@ export default function PayrollPage() {
                       required
                     >
                       <option value={0}>اختر موظف</option>
-                      {employees.map(emp => (
-                        <option key={emp.id} value={emp.id}>{emp.name}</option>
-                      ))}
+                      {employees
+                        .filter(emp => !employeePayrolls.some(p => p.employeeId === emp.id))
+                        .map(emp => (
+                          <option key={emp.id} value={emp.id}>{emp.name}</option>
+                        ))}
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -463,9 +465,11 @@ export default function PayrollPage() {
                       required
                     >
                       <option value={0}>اختر متعاون</option>
-                      {contractors.map(con => (
-                        <option key={con.id} value={con.id}>{con.name}</option>
-                      ))}
+                      {contractors
+                        .filter(con => !contractorPayrolls.some(p => p.contractorId === con.id))
+                        .map(con => (
+                          <option key={con.id} value={con.id}>{con.name}</option>
+                        ))}
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
