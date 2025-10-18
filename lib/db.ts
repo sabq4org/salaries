@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import { eq } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 
-const { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements } = schema;
+const { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements, reminders } = schema;
 
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
 const client = postgres(connectionString, { prepare: false });
@@ -163,5 +163,78 @@ export async function updateLeaveSettlement(id: number, data: Partial<typeof lea
 
 export async function deleteLeaveSettlement(id: number) {
   await db.delete(leaveSettlements).where(eq(leaveSettlements.id, id));
+}
+
+
+
+// Reminders
+export async function getAllReminders() {
+  const results = await db
+    .select({
+      id: reminders.id,
+      title: reminders.title,
+      type: reminders.type,
+      employeeId: reminders.employeeId,
+      employeeName: employees.name,
+      startDate: reminders.startDate,
+      dueDate: reminders.dueDate,
+      notes: reminders.notes,
+      status: reminders.status,
+      isCompleted: reminders.isCompleted,
+      createdAt: reminders.createdAt,
+      updatedAt: reminders.updatedAt,
+    })
+    .from(reminders)
+    .leftJoin(employees, eq(reminders.employeeId, employees.id))
+    .orderBy(reminders.dueDate);
+  
+  return results;
+}
+
+export async function getActiveReminders() {
+  const results = await db
+    .select({
+      id: reminders.id,
+      title: reminders.title,
+      type: reminders.type,
+      employeeId: reminders.employeeId,
+      employeeName: employees.name,
+      startDate: reminders.startDate,
+      dueDate: reminders.dueDate,
+      notes: reminders.notes,
+      status: reminders.status,
+      isCompleted: reminders.isCompleted,
+      createdAt: reminders.createdAt,
+      updatedAt: reminders.updatedAt,
+    })
+    .from(reminders)
+    .leftJoin(employees, eq(reminders.employeeId, employees.id))
+    .where(eq(reminders.isCompleted, false))
+    .orderBy(reminders.dueDate);
+  
+  return results;
+}
+
+export async function createReminder(data: typeof reminders.$inferInsert) {
+  const result = await db.insert(reminders).values(data).returning();
+  return result[0];
+}
+
+export async function updateReminder(id: number, data: Partial<typeof reminders.$inferInsert>) {
+  const result = await db.update(reminders).set(data).where(eq(reminders.id, id)).returning();
+  return result[0];
+}
+
+export async function deleteReminder(id: number) {
+  await db.delete(reminders).where(eq(reminders.id, id));
+}
+
+export async function completeReminder(id: number) {
+  const result = await db
+    .update(reminders)
+    .set({ isCompleted: true, status: 'completed', updatedAt: new Date() })
+    .where(eq(reminders.id, id))
+    .returning();
+  return result[0];
 }
 

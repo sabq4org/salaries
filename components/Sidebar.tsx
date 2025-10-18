@@ -12,7 +12,8 @@ import {
   Settings,
   HelpCircle,
   X,
-  Calendar
+  Calendar,
+  Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +28,7 @@ const menuItems = [
   { icon: UserCheck, label: "المتعاونون", href: "/contractors" },
   { icon: DollarSign, label: "مسير الرواتب", href: "/payroll" },
   { icon: Calendar, label: "تصفية إجازة", href: "/leave-settlement" },
+  { icon: Bell, label: "التذكيرات", href: "/reminders" },
   { icon: TrendingUp, label: "الميزانية السنوية", href: "/budget" },
   { icon: FileText, label: "التقارير", href: "/reports" },
 ];
