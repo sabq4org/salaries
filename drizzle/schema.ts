@@ -99,13 +99,35 @@ export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
   year: integer("year").notNull(),
   month: integer("month").notNull(),
+  quarter: integer("quarter").notNull(), // 1, 2, 3, 4
   type: expenseTypeEnum("type").notNull(),
   description: text("description"),
   amount: integer("amount").notNull().default(0),
+  date: timestamp("date").notNull().defaultNow(),
+  notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = typeof expenses.$inferInsert;
+
+/**
+ * جدول الإيرادات
+ */
+export const revenues = pgTable("revenues", {
+  id: serial("id").primaryKey(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(),
+  quarter: integer("quarter").notNull(), // 1, 2, 3, 4
+  source: text("source").notNull(),
+  amount: integer("amount").notNull().default(0),
+  date: timestamp("date").notNull().defaultNow(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type Revenue = typeof revenues.$inferSelect;
+export type InsertRevenue = typeof revenues.$inferInsert;
 
