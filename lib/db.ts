@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import * as schema from "@/drizzle/schema";
 import { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements, reminders, expenseCategories } from "@/drizzle/schema";
 
@@ -83,8 +83,14 @@ export async function getAllPayroll(year?: number, month?: number) {
   let query = db.select().from(employeePayrolls);
   
   if (year && month) {
+    query = query.where(
+      and(
+        eq(employeePayrolls.year, year),
+        eq(employeePayrolls.month, month)
+      )
+    ) as any;
+  } else if (year) {
     query = query.where(eq(employeePayrolls.year, year));
-    // Note: Add month filter if needed
   }
   
   return await query;
