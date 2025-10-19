@@ -31,7 +31,7 @@ interface Expense {
   year: number;
   month: number;
   quarter: number;
-  type: 'salary' | 'operational' | 'marketing' | 'other';
+  type: string;
   description: string | null;
   amount: number;
   date: string;
@@ -49,9 +49,21 @@ interface Revenue {
   notes: string | null;
 }
 
+interface ExpenseCategory {
+  id: number;
+  name: string;
+  nameEn: string | null;
+  description: string | null;
+  color: string | null;
+  icon: string | null;
+  isActive: boolean;
+  displayOrder: number;
+}
+
 export default function QuarterlyBudgetPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [revenues, setRevenues] = useState<Revenue[]>([]);
+  const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedQuarter, setSelectedQuarter] = useState(Math.ceil((new Date().getMonth() + 1) / 3));
@@ -64,7 +76,7 @@ export default function QuarterlyBudgetPage() {
   const [itemToDelete, setItemToDelete] = useState<{ type: 'expense' | 'revenue', id: number } | null>(null);
 
   const [expenseForm, setExpenseForm] = useState({
-    type: 'operational' as 'salary' | 'operational' | 'marketing' | 'other',
+    type: '',
     description: '',
     amount: 0,
     date: new Date().toISOString().split('T')[0],
@@ -79,8 +91,29 @@ export default function QuarterlyBudgetPage() {
   });
 
   useEffect(() => {
+    fetchExpenseCategories();
+  }, []);
+
+  useEffect(() => {
     fetchData();
   }, [selectedYear, selectedQuarter]);
+
+  const fetchExpenseCategories = async () => {
+    try {
+      const response = await fetch('/api/expense-categories?active=true');
+      if (response.ok) {
+        const categories = await response.json();
+        setExpenseCategories(categories);
+        // Set default category if available
+        if (categories.length > 0 && !expenseForm.type) {
+          setExpenseForm(prev => ({ ...prev, type: categories[0].name }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching expense categories:', error);
+      toast.error('فشل في تحميل فئات المصروفات');
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -132,7 +165,7 @@ export default function QuarterlyBudgetPage() {
         toast.success('تم إضافة المصروف بنجاح');
         setExpenseDialogOpen(false);
         setExpenseForm({
-          type: 'operational',
+          type: expenseCategories.length > 0 ? expenseCategories[0].name : '',
           description: '',
           amount: 0,
           date: new Date().toISOString().split('T')[0],
@@ -176,7 +209,7 @@ export default function QuarterlyBudgetPage() {
         setExpenseDialogOpen(false);
         setEditingExpense(null);
         setExpenseForm({
-          type: 'operational',
+          type: expenseCategories.length > 0 ? expenseCategories[0].name : '',
           description: '',
           amount: 0,
           date: new Date().toISOString().split('T')[0],
@@ -328,7 +361,7 @@ export default function QuarterlyBudgetPage() {
     setExpenseDialogOpen(false);
     setEditingExpense(null);
     setExpenseForm({
-      type: 'operational',
+      type: expenseCategories.length > 0 ? expenseCategories[0].name : '',
       description: '',
       amount: 0,
       date: new Date().toISOString().split('T')[0],
@@ -354,11 +387,10 @@ export default function QuarterlyBudgetPage() {
     { id: 4, name: 'الربع الرابع', months: 'أكتوبر - ديسمبر' },
   ];
 
-  const typeLabels = {
-    salary: 'رواتب',
-    operational: 'تشغيلية',
-    marketing: 'تسويق',
-    other: 'أخرى',
+  // Create a map of category names for display
+  const getCategoryDisplay = (categoryName: string) => {
+    const category = expenseCategories.find(cat => cat.name === categoryName);
+    return category ? category.name : categoryName;
   };
 
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -368,35 +400,37 @@ export default function QuarterlyBudgetPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">الميزانية الربعية</h1>
-            <p className="text-gray-600 mt-1">تتبع الإيرادات والمصروفات ربع سنوياً</p>
+            <h1 className="text-3xl font-bold">الميزانية الربعية</h1>
+            <p className="text-gray-600 mt-1">إدارة المصروفات والإيرادات الربعية</p>
           </div>
           <Link href="/budget/annual">
-            <Button style={{ backgroundColor: '#10b981' }} className="text-white">
-              الميزانية السنوية
+            <Button variant="outline">
+              عرض الميزانية السنوية
             </Button>
           </Link>
         </div>
 
         {/* Year Selector */}
-        <div className="mb-6 flex gap-4">
-          <div>
-            <Label>السنة</Label>
-            <Input
-              type="number"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="mt-1 w-32"
-            />
-          </div>
+        <div className="flex gap-4 items-center">
+          <Label className="text-lg font-semibold">السنة:</Label>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            className="p-2 border rounded-md"
+          >
+            {[2023, 2024, 2025, 2026, 2027].map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
         </div>
 
-        {/* Quarters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Quarter Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quarters.map((quarter) => {
-            const isSelected = quarter.id === selectedQuarter;
+            const isSelected = selectedQuarter === quarter.id;
             return (
               <button
                 key={quarter.id}
@@ -505,7 +539,7 @@ export default function QuarterlyBudgetPage() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-right py-3 px-4">التاريخ</th>
-                      <th className="text-right py-3 px-4">النوع</th>
+                      <th className="text-right py-3 px-4">الفئة</th>
                       <th className="text-right py-3 px-4">الوصف</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
                       <th className="text-right py-3 px-4">الإجراءات</th>
@@ -515,7 +549,7 @@ export default function QuarterlyBudgetPage() {
                     {expenses.map((expense) => (
                       <tr key={expense.id} className="border-b hover:bg-gray-50">
                         <td className="py-3 px-4">{new Date(expense.date).toLocaleDateString('ar-SA')}</td>
-                        <td className="py-3 px-4">{typeLabels[expense.type]}</td>
+                        <td className="py-3 px-4">{getCategoryDisplay(expense.type)}</td>
                         <td className="py-3 px-4">{expense.description || '-'}</td>
                         <td className="py-3 px-4 font-semibold">{expense.amount.toLocaleString()} ر.س</td>
                         <td className="py-3 px-4">
@@ -555,6 +589,7 @@ export default function QuarterlyBudgetPage() {
                       <th className="text-right py-3 px-4">التاريخ</th>
                       <th className="text-right py-3 px-4">المصدر</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
+                      <th className="text-right py-3 px-4">الملاحظات</th>
                       <th className="text-right py-3 px-4">الإجراءات</th>
                     </tr>
                   </thead>
@@ -564,6 +599,7 @@ export default function QuarterlyBudgetPage() {
                         <td className="py-3 px-4">{new Date(revenue.date).toLocaleDateString('ar-SA')}</td>
                         <td className="py-3 px-4">{revenue.source}</td>
                         <td className="py-3 px-4 font-semibold">{revenue.amount.toLocaleString()} ر.س</td>
+                        <td className="py-3 px-4">{revenue.notes || '-'}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
                             <Button
@@ -604,17 +640,22 @@ export default function QuarterlyBudgetPage() {
           </DialogHeader>
           <form onSubmit={editingExpense ? handleEditExpense : handleAddExpense} className="space-y-4">
             <div>
-              <Label>النوع</Label>
+              <Label>الفئة</Label>
               <select
                 value={expenseForm.type}
-                onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value as any })}
+                onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value })}
                 className="w-full mt-1 p-2 border rounded-md"
                 required
               >
-                <option value="salary">رواتب</option>
-                <option value="operational">تشغيلية</option>
-                <option value="marketing">تسويق</option>
-                <option value="other">أخرى</option>
+                {expenseCategories.length === 0 ? (
+                  <option value="">لا توجد فئات متاحة</option>
+                ) : (
+                  expenseCategories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             <div>
@@ -714,8 +755,7 @@ export default function QuarterlyBudgetPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف {itemToDelete?.type === 'expense' ? 'هذا المصروف' : 'هذا الإيراد'}؟ 
-              لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من حذف هذا {itemToDelete?.type === 'expense' ? 'المصروف' : 'الإيراد'}؟ لا يمكن التراجع عن هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
