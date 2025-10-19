@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { expenses } from '@/drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { logAudit, getClientIp, getUserAgent } from '@/lib/audit';
+import { validatePeriodNotLocked } from '@/lib/period-lock';
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,6 +58,9 @@ export async function POST(request: NextRequest) {
     
     console.log('POST /api/expenses - Inserting:', expenseData);
     
+    // التحقق من أن الفترة غير مقفلة
+    await validatePeriodNotLocked(expenseData.year, expenseData.month);
+    
     const result = await db.insert(expenses).values(expenseData).returning();
     
     console.log('POST /api/expenses - Success:', result[0]);
@@ -95,6 +99,11 @@ export async function PUT(request: NextRequest) {
     
     // الحصول على البيانات القديمة قبل التحديث
     const oldExpense = await db.select().from(expenses).where(eq(expenses.id, parseInt(id))).limit(1);
+    
+    // التحقق من أن الفترة غير مقفلة
+    if (oldExpense[0]) {
+      await validatePeriodNotLocked(oldExpense[0].year, oldExpense[0].month);
+    }
     
     const expenseData: any = { updatedAt: new Date() };
     if (body.year !== undefined) expenseData.year = parseInt(body.year);
@@ -143,6 +152,11 @@ export async function DELETE(request: NextRequest) {
     
     // الحصول على البيانات قبل الحذف
     const oldExpense = await db.select().from(expenses).where(eq(expenses.id, parseInt(id))).limit(1);
+    
+    // التحقق من أن الفترة غير مقفلة
+    if (oldExpense[0]) {
+      await validatePeriodNotLocked(oldExpense[0].year, oldExpense[0].month);
+    }
     
     await db.delete(expenses).where(eq(expenses.id, parseInt(id)));
     

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { revenues } from '@/drizzle/schema';
 import { eq, and } from 'drizzle-orm';
+import { validatePeriodNotLocked } from '@/lib/period-lock';
 
 // GET - جلب الإيرادات
 export async function GET(request: NextRequest) {
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { year, month, quarter, source, amount, date, notes, attachmentUrl } = body;
 
+    // التحقق من أن الفترة غير مقفلة
+    if (year && month) {
+      await validatePeriodNotLocked(year, month);
+    }
+
     const result = await db.insert(revenues).values({
       year,
       month,
@@ -68,6 +74,12 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { year, month, quarter, source, amount, date, notes, attachmentUrl } = body;
 
+    // الحصول على البيانات القديمة للتحقق من الفترة
+    const oldRevenue = await db.select().from(revenues).where(eq(revenues.id, parseInt(id))).limit(1);
+    if (oldRevenue[0]) {
+      await validatePeriodNotLocked(oldRevenue[0].year, oldRevenue[0].month);
+    }
+
     const result = await db.update(revenues)
       .set({
         year,
@@ -98,6 +110,12 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    // الحصول على البيانات قبل الحذف للتحقق من الفترة
+    const oldRevenue = await db.select().from(revenues).where(eq(revenues.id, parseInt(id))).limit(1);
+    if (oldRevenue[0]) {
+      await validatePeriodNotLocked(oldRevenue[0].year, oldRevenue[0].month);
     }
 
     await db.delete(revenues).where(eq(revenues.id, parseInt(id)));

@@ -14,7 +14,8 @@ import {
   Calendar,
   Bell,
   Shield,
-  CheckSquare
+  CheckSquare,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +35,7 @@ const menuItems = [
   { icon: FileText, label: "التقارير", href: "/reports" },
   { icon: Shield, label: "سجل التدقيق", href: "/audit-log" },
   { icon: CheckSquare, label: "الموافقات المعلقة", href: "/pending-approvals" },
+  { icon: Lock, label: "إدارة الفترات المالية", href: "/period-locks" },
   { icon: Settings2, label: "الإعدادات", href: "/settings" },
 ];
 

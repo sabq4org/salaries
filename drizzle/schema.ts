@@ -284,3 +284,28 @@ export const pendingApprovals = pgTable("pending_approvals", {
 export type PendingApproval = typeof pendingApprovals.$inferSelect;
 export type InsertPendingApproval = typeof pendingApprovals.$inferInsert;
 
+
+/**
+ * جدول قفل الفترات المالية
+ * يمنع التعديل على البيانات المالية للفترات المقفلة
+ */
+export const periodLocks = pgTable("period_locks", {
+  id: serial("id").primaryKey(),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(), // 1-12
+  isLocked: boolean("isLocked").notNull().default(false),
+  lockedBy: varchar("lockedBy", { length: 64 }).references(() => users.id),
+  lockedByName: varchar("lockedByName", { length: 255 }),
+  lockedAt: timestamp("lockedAt"),
+  lockReason: text("lockReason"),
+  unlockedBy: varchar("unlockedBy", { length: 64 }).references(() => users.id),
+  unlockedByName: varchar("unlockedByName", { length: 255 }),
+  unlockedAt: timestamp("unlockedAt"),
+  unlockReason: text("unlockReason"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type PeriodLock = typeof periodLocks.$inferSelect;
+export type InsertPeriodLock = typeof periodLocks.$inferInsert;
+

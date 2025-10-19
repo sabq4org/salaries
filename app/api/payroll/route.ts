@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllPayroll, createPayroll, updatePayroll, deletePayroll } from '@/lib/db';
+import { validatePeriodNotLocked } from '@/lib/period-lock';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,11 +22,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // التحقق من أن الفترة غير مقفلة
+    if (body.year && body.month) {
+      await validatePeriodNotLocked(body.year, body.month);
+    }
+    
     const payroll = await createPayroll(body);
     return NextResponse.json(payroll, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('POST /api/payroll error:', error);
-    return NextResponse.json({ error: 'Failed to create payroll' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to create payroll' }, { status: 500 });
   }
 }
 
@@ -39,11 +46,17 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
+    
+    // التحقق من أن الفترة غير مقفلة
+    if (body.year && body.month) {
+      await validatePeriodNotLocked(body.year, body.month);
+    }
+    
     const payroll = await updatePayroll(parseInt(id), body);
     return NextResponse.json(payroll);
-  } catch (error) {
+  } catch (error: any) {
     console.error('PUT /api/payroll error:', error);
-    return NextResponse.json({ error: 'Failed to update payroll' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to update payroll' }, { status: 500 });
   }
 }
 
@@ -51,16 +64,23 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const year = searchParams.get('year');
+    const month = searchParams.get('month');
     
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
+    // التحقق من أن الفترة غير مقفلة
+    if (year && month) {
+      await validatePeriodNotLocked(parseInt(year), parseInt(month));
+    }
+
     await deletePayroll(parseInt(id));
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('DELETE /api/payroll error:', error);
-    return NextResponse.json({ error: 'Failed to delete payroll' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to delete payroll' }, { status: 500 });
   }
 }
 
