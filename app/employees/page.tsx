@@ -170,7 +170,7 @@ export default function EmployeesPage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#2563eb' }}></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"></div>
             <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>
@@ -198,14 +198,13 @@ export default function EmployeesPage() {
                 setEditingId(null);
                 setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0, leaveBalance: 0 });
               }}
-              style={{ backgroundColor: '#2563eb' }}
               className="text-white hover:opacity-90"
             >
               <Plus className="ml-2 h-4 w-4" />
               إضافة موظف جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: '#ffffff' }}>
+          <DialogContent className="sm:max-w-[500px]" className="bg-card">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">
                 {editingId ? 'تعديل موظف' : 'إضافة موظف جديد'}
@@ -266,7 +265,7 @@ export default function EmployeesPage() {
                 />
               </div>
               <div className="flex gap-2 pt-4">
-                <Button type="submit" style={{ backgroundColor: '#2563eb' }} className="flex-1 text-white">
+                <Button type="submit" className="flex-1 text-white">
                   {editingId ? 'حفظ التعديلات' : 'إضافة'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
@@ -282,7 +281,7 @@ export default function EmployeesPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -291,7 +290,7 @@ export default function EmployeesPage() {
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              className="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
             >
               <Users className="h-6 w-6" />
             </div>
@@ -300,7 +299,7 @@ export default function EmployeesPage() {
 
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -314,7 +313,7 @@ export default function EmployeesPage() {
 
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -330,7 +329,7 @@ export default function EmployeesPage() {
       {/* Table */}
       <div 
         className="rounded-xl overflow-hidden"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        className="bg-card border border-border"
       >
         <div className="overflow-x-auto">
           <DndContext
@@ -339,7 +338,7 @@ export default function EmployeesPage() {
             onDragEnd={handleDragEnd}
           >
             <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <thead className="bg-accent">
                 <tr>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700 w-12"></th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>

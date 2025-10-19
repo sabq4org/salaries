@@ -46,17 +46,17 @@ export default function LoginPage() {
   return (
     <div 
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: '#f8f8f7' }}
+      className="bg-accent"
     >
       <div 
         className="w-full max-w-md p-8 rounded-2xl shadow-lg"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        className="bg-card border border-border"
       >
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-            style={{ backgroundColor: '#eff6ff' }}
+            className="bg-blue-50 dark:bg-blue-950"
           >
             <Lock className="h-8 w-8" style={{ color: '#2563eb' }} />
           </div>
@@ -81,7 +81,6 @@ export default function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="pr-10 h-12 text-lg"
-                style={{ borderColor: '#f0f0ef' }}
                 placeholder="أدخل اسم المستخدم"
               />
             </div>
@@ -102,7 +101,6 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="pr-10 pl-10 h-12 text-lg"
-                style={{ borderColor: '#f0f0ef' }}
                 placeholder="أدخل كلمة المرور"
               />
               <button
@@ -123,7 +121,6 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full h-12 text-lg font-semibold text-white"
-            style={{ backgroundColor: '#2563eb' }}
           >
             {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </Button>

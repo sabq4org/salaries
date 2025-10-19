@@ -524,8 +524,7 @@ export default function QuarterlyBudgetPage() {
             </h2>
             <Button
               onClick={() => activeTab === 'expenses' ? setExpenseDialogOpen(true) : setRevenueDialogOpen(true)}
-              style={{ backgroundColor: activeTab === 'expenses' ? '#ef4444' : '#10b981' }}
-              className="text-white"
+              className={`text-white ${activeTab === 'expenses' ? 'bg-destructive' : 'bg-green-600'}`}
             >
               <Plus className="ml-2" size={20} />
               {activeTab === 'expenses' ? 'إضافة مصروف' : 'إضافة إيراد'}
@@ -558,7 +557,7 @@ export default function QuarterlyBudgetPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditExpenseDialog(expense)}
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
                             >
                               <Edit2 size={16} />
                             </Button>
@@ -566,7 +565,7 @@ export default function QuarterlyBudgetPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openDeleteDialog('expense', expense.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
                             >
                               <Trash2 size={16} />
                             </Button>
@@ -606,7 +605,7 @@ export default function QuarterlyBudgetPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditRevenueDialog(revenue)}
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
                             >
                               <Edit2 size={16} />
                             </Button>
@@ -614,7 +613,7 @@ export default function QuarterlyBudgetPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openDeleteDialog('revenue', revenue.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
                             >
                               <Trash2 size={16} />
                             </Button>
@@ -644,7 +643,7 @@ export default function QuarterlyBudgetPage() {
               <select
                 value={expenseForm.type}
                 onChange={(e) => setExpenseForm({ ...expenseForm, type: e.target.value })}
-                className="w-full mt-1 p-2 border rounded-md"
+                className="w-full mt-1 p-2 border rounded-md bg-input text-foreground"
                 required
               >
                 {expenseCategories.length === 0 ? (
@@ -693,7 +692,7 @@ export default function QuarterlyBudgetPage() {
                 placeholder="ملاحظات إضافية (اختياري)"
               />
             </div>
-            <Button type="submit" className="w-full" style={{ backgroundColor: '#ef4444' }}>
+            <Button type="submit" className="w-full bg-destructive">
               {editingExpense ? 'تحديث' : 'إضافة'}
             </Button>
           </form>
@@ -742,7 +741,7 @@ export default function QuarterlyBudgetPage() {
                 placeholder="ملاحظات إضافية (اختياري)"
               />
             </div>
-            <Button type="submit" className="w-full" style={{ backgroundColor: '#10b981' }}>
+            <Button type="submit" className="w-full bg-green-600">
               {editingRevenue ? 'تحديث' : 'إضافة'}
             </Button>
           </form>
@@ -760,7 +759,7 @@ export default function QuarterlyBudgetPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
               حذف
             </AlertDialogAction>
           </AlertDialogFooter>

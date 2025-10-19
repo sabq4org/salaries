@@ -164,7 +164,7 @@ export default function ContractorsPage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#16a34a' }}></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 border-primary"></div>
             <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>
@@ -192,14 +192,13 @@ export default function ContractorsPage() {
                 setEditingId(null);
                 setFormData({ name: "", position: "", salary: 0 });
               }}
-              style={{ backgroundColor: '#16a34a' }}
-              className="text-white hover:opacity-90"
+              className="bg-primary text-primary-foreground hover:opacity-90"
             >
               <Plus className="ml-2 h-4 w-4" />
               إضافة متعاون جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: '#ffffff' }}>
+          <DialogContent className="sm:max-w-[500px] bg-card">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">
                 {editingId ? 'تعديل متعاون' : 'إضافة متعاون جديد'}
@@ -237,7 +236,7 @@ export default function ContractorsPage() {
                 />
               </div>
               <div className="flex gap-2 pt-4">
-                <Button type="submit" style={{ backgroundColor: '#16a34a' }} className="flex-1 text-white">
+                <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
                   {editingId ? 'حفظ التعديلات' : 'إضافة'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
@@ -251,28 +250,19 @@ export default function ContractorsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div 
-          className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-        >
+        <div className="p-6 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">إجمالي المتعاونين</p>
               <p className="text-3xl font-bold text-foreground">{contractors.length}</p>
             </div>
-            <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#dcfce7', color: '#16a34a' }}
-            >
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400">
               <Users className="h-6 w-6" />
             </div>
           </div>
         </div>
 
-        <div 
-          className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-        >
+        <div className="p-6 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
@@ -285,10 +275,7 @@ export default function ContractorsPage() {
       </div>
 
       {/* Table */}
-      <div 
-        className="rounded-xl overflow-hidden"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
-      >
+      <div className="rounded-xl overflow-hidden bg-card border border-border">
         <div className="overflow-x-auto">
           <DndContext
             sensors={sensors}
@@ -296,13 +283,13 @@ export default function ContractorsPage() {
             onDragEnd={handleDragEnd}
           >
             <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <thead className="bg-muted">
                 <tr>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700 w-12"></th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
-                  <th className="text-right p-4 text-sm font-semibold text-gray-700">الراتب</th>
-                  <th className="text-center p-4 text-sm font-semibold text-gray-700">الإجراءات</th>
+                  <th className="text-right p-4 text-sm font-semibold text-muted-foreground w-12"></th>
+                  <th className="text-right p-4 text-sm font-semibold text-muted-foreground">الاسم</th>
+                  <th className="text-right p-4 text-sm font-semibold text-muted-foreground">المنصب</th>
+                  <th className="text-right p-4 text-sm font-semibold text-muted-foreground">الراتب</th>
+                  <th className="text-center p-4 text-sm font-semibold text-muted-foreground">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>

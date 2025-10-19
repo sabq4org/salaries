@@ -110,7 +110,7 @@ export default function ReportsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div 
             className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+            className="bg-card border border-border"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -119,7 +119,7 @@ export default function ReportsPage() {
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+                className="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
               >
                 <Users className="h-6 w-6" />
               </div>
@@ -128,7 +128,7 @@ export default function ReportsPage() {
 
           <div 
             className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+            className="bg-card border border-border"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -137,7 +137,7 @@ export default function ReportsPage() {
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}
+                className="bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400"
               >
                 <Users className="h-6 w-6" />
               </div>
@@ -146,7 +146,7 @@ export default function ReportsPage() {
 
           <div 
             className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+            className="bg-card border border-border"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -155,7 +155,7 @@ export default function ReportsPage() {
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#fef3f2', color: '#dc2626' }}
+                className="bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
               >
                 <DollarSign className="h-6 w-6" />
               </div>
@@ -164,7 +164,7 @@ export default function ReportsPage() {
 
           <div 
             className="p-6 rounded-xl"
-            style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+            className="bg-card border border-border"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -173,7 +173,7 @@ export default function ReportsPage() {
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: '#fef9c3', color: '#ca8a04' }}
+                className="bg-yellow-50 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-600"
               >
                 <TrendingUp className="h-6 w-6" />
               </div>
@@ -184,7 +184,7 @@ export default function ReportsPage() {
         {/* Employees Summary */}
         <div 
           className="p-6 rounded-xl mb-8"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
@@ -192,7 +192,7 @@ export default function ReportsPage() {
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <thead className="bg-accent">
                 <tr>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
@@ -213,7 +213,7 @@ export default function ReportsPage() {
                       key={emp.id}
                       style={{ 
                         borderTop: '1px solid #f0f0ef',
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                        backgroundColor: 'transparent'
                       }}
                       className="hover:bg-accent transition-colors"
                     >
@@ -241,7 +241,7 @@ export default function ReportsPage() {
         {/* Contractors Summary */}
         <div 
           className="p-6 rounded-xl mb-8"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
@@ -249,7 +249,7 @@ export default function ReportsPage() {
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <thead className="bg-accent">
                 <tr>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
@@ -269,7 +269,7 @@ export default function ReportsPage() {
                       key={con.id}
                       style={{ 
                         borderTop: '1px solid #f0f0ef',
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                        backgroundColor: 'transparent'
                       }}
                       className="hover:bg-accent transition-colors"
                     >
@@ -293,7 +293,7 @@ export default function ReportsPage() {
         {/* Expenses Summary */}
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
@@ -301,7 +301,7 @@ export default function ReportsPage() {
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead style={{ backgroundColor: '#f8f8f7' }}>
+              <thead className="bg-accent">
                 <tr>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">النوع</th>
                   <th className="text-right p-4 text-sm font-semibold text-gray-700">المبلغ</th>
@@ -321,7 +321,7 @@ export default function ReportsPage() {
                       key={type}
                       style={{ 
                         borderTop: '1px solid #f0f0ef',
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                        backgroundColor: 'transparent'
                       }}
                       className="hover:bg-accent transition-colors"
                     >

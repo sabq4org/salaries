@@ -122,7 +122,7 @@ export default function AnnualBudgetPage() {
             <p className="text-muted-foreground">ملخص شامل للإيرادات والمصروفات السنوية</p>
           </div>
           <Link href="/budget/quarterly">
-            <Button style={{ backgroundColor: '#2563eb' }} className="text-white">
+            <Button className="bg-primary text-primary-foreground">
               الميزانية الربعية
             </Button>
           </Link>

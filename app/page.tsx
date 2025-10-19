@@ -69,7 +69,7 @@ export default function HomePage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#2563eb' }}></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" className="border-primary"></div>
             <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>

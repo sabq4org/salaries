@@ -31,10 +31,7 @@ export default function StatsCard({
   return (
     <div 
       className="p-6 rounded-xl hover:shadow-md transition-all duration-200 cursor-pointer"
-      style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #f0f0ef'
-      }}
+      className="bg-card border border-border"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">

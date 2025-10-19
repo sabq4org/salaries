@@ -33,8 +33,8 @@ export function SortableRow({ contractor, index, onEdit, onDelete }: SortableRow
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa',
-    borderTop: '1px solid #f0f0ef',
+    backgroundColor: 'transparent',
+    borderTop: '1px solid var(--border)',
   };
 
   return (
@@ -55,7 +55,7 @@ export function SortableRow({ contractor, index, onEdit, onDelete }: SortableRow
             onClick={() => onEdit(contractor)}
             className="hover:bg-blue-50"
           >
-            <Pencil className="h-4 w-4" style={{ color: '#2563eb' }} />
+            <Pencil className="h-4 w-4 text-primary" />
           </Button>
           <Button
             variant="ghost"
@@ -63,7 +63,7 @@ export function SortableRow({ contractor, index, onEdit, onDelete }: SortableRow
             onClick={() => onDelete(contractor.id)}
             className="hover:bg-red-50"
           >
-            <Trash2 className="h-4 w-4" style={{ color: '#dc2626' }} />
+            <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
       </td>

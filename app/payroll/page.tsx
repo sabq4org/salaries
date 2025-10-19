@@ -494,7 +494,7 @@ export default function PayrollPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr style={{ backgroundColor: '#f8f8f7' }}>
+                  <tr className="bg-accent">
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الموظف</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المنصب</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب الأساسي</th>
@@ -635,7 +635,7 @@ export default function PayrollPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr style={{ backgroundColor: '#f8f8f7' }}>
+                  <tr className="bg-accent">
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المتعاون</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">المنصب</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">الراتب</th>

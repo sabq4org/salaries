@@ -34,7 +34,7 @@ export function SortableRow({ employee, index, onEdit, onDelete }: SortableRowPr
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa',
+    backgroundColor: 'transparent',
     borderTop: '1px solid #f0f0ef',
   };
 

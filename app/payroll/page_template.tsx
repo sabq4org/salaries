@@ -145,7 +145,7 @@ export default function EmployeesPage() {
               إضافة موظف جديد
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: '#ffffff' }}>
+          <DialogContent className="sm:max-w-[500px]" className="bg-card">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">
                 {editingId ? 'تعديل موظف' : 'إضافة موظف جديد'}
@@ -210,7 +210,7 @@ export default function EmployeesPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -219,7 +219,7 @@ export default function EmployeesPage() {
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}
+              className="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
             >
               <Users className="h-6 w-6" />
             </div>
@@ -228,7 +228,7 @@ export default function EmployeesPage() {
 
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -242,7 +242,7 @@ export default function EmployeesPage() {
 
         <div 
           className="p-6 rounded-xl"
-          style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+          className="bg-card border border-border"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -258,11 +258,11 @@ export default function EmployeesPage() {
       {/* Table */}
       <div 
         className="rounded-xl overflow-hidden"
-        style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
+        className="bg-card border border-border"
       >
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead style={{ backgroundColor: '#f8f8f7' }}>
+            <thead className="bg-accent">
               <tr>
                 <th className="text-right p-4 text-sm font-semibold text-gray-700">الاسم</th>
                 <th className="text-right p-4 text-sm font-semibold text-gray-700">المنصب</th>
@@ -284,7 +284,7 @@ export default function EmployeesPage() {
                     key={employee.id}
                     style={{ 
                       borderTop: '1px solid #f0f0ef',
-                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                      backgroundColor: 'transparent'
                     }}
                     className="hover:bg-accent transition-colors"
                   >
