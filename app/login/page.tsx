@@ -57,12 +57,12 @@ export default function LoginPage() {
         {/* Content */}
         <div className="relative z-10">
           {/* Logo */}
-          <div className="mb-12">
+          <div className="mb-8">
             <Image
               src="/images/sabq-logo.png"
               alt="صحيفة سبق"
-              width={300}
-              height={150}
+              width={200}
+              height={100}
               className="brightness-0 invert"
               priority
             />
@@ -138,8 +138,8 @@ export default function LoginPage() {
             <Image
               src="/images/sabq-logo.png"
               alt="صحيفة سبق"
-              width={200}
-              height={100}
+              width={150}
+              height={75}
               className="mx-auto"
               priority
             />
