@@ -141,7 +141,7 @@ export default function RemindersPage() {
     try {
       const payload = {
         ...formData,
-        employeeId: formData.employeeId ? parseInt(formData.employeeId) : null,
+        employeeId: formData.employeeId && formData.employeeId !== 'none' ? parseInt(formData.employeeId) : null,
         startDate: startDate?.toISOString() || null,
         dueDate: dueDate.toISOString(),
       };
@@ -322,7 +322,7 @@ export default function RemindersPage() {
                         <SelectValue placeholder="اختر الموظف" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">بدون موظف</SelectItem>
+                        <SelectItem value="none">بدون موظف</SelectItem>
                         {employees.map((emp) => (
                           <SelectItem key={emp.id} value={emp.id.toString()}>
                             {emp.name}

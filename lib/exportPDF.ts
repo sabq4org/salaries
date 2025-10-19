@@ -1,3 +1,5 @@
+"use client";
+
 interface EmployeePayroll {
   id: number;
   employeeId: number;
