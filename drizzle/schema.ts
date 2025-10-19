@@ -206,3 +206,19 @@ export const reminders = pgTable("reminders", {
 export type Reminder = typeof reminders.$inferSelect;
 export type InsertReminder = typeof reminders.$inferInsert;
 
+
+
+// جدول بنود المصروفات
+export const expenseCategories = pgTable("expense_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  nameEn: varchar("nameEn", { length: 100 }),
+  description: text("description"),
+  color: varchar("color", { length: 20 }).default("#3b82f6"),
+  icon: varchar("icon", { length: 50 }),
+  isActive: boolean("isActive").notNull().default(true),
+  displayOrder: integer("displayOrder").notNull().default(0),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+

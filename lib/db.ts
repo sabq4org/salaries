@@ -1,9 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq } from "drizzle-orm";
-import * as schema from "../drizzle/schema";
-
-const { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements, reminders } = schema;
+import * as schema from "../drimport { employees, contractors, employeePayrolls, contractorPayrolls, expenses, leaveSettlements, reminders, expenseCategories } from "@/drizzle/schema";
 
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
 const client = postgres(connectionString, { prepare: false });
@@ -236,5 +234,53 @@ export async function completeReminder(id: number) {
     .where(eq(reminders.id, id))
     .returning();
   return result[0];
+}
+
+
+
+
+// ============================================
+// Expense Categories Functions
+// ============================================
+
+export async function getAllExpenseCategories() {
+  return await db.select().from(expenseCategories).orderBy(expenseCategories.displayOrder);
+}
+
+export async function getActiveExpenseCategories() {
+  return await db
+    .select()
+    .from(expenseCategories)
+    .where(eq(expenseCategories.isActive, true))
+    .orderBy(expenseCategories.displayOrder);
+}
+
+export async function getExpenseCategoryById(id: number) {
+  const result = await db.select().from(expenseCategories).where(eq(expenseCategories.id, id));
+  return result[0];
+}
+
+export async function createExpenseCategory(data: typeof expenseCategories.$inferInsert) {
+  const result = await db.insert(expenseCategories).values(data).returning();
+  return result[0];
+}
+
+export async function updateExpenseCategory(id: number, data: Partial<typeof expenseCategories.$inferInsert>) {
+  const result = await db.update(expenseCategories).set({ ...data, updatedAt: new Date() }).where(eq(expenseCategories.id, id)).returning();
+  return result[0];
+}
+
+export async function deleteExpenseCategory(id: number) {
+  await db.delete(expenseCategories).where(eq(expenseCategories.id, id));
+}
+
+export async function reorderExpenseCategories(categoryIds: number[]) {
+  // تحديث ترتيب البنود
+  for (let i = 0; i < categoryIds.length; i++) {
+    await db
+      .update(expenseCategories)
+      .set({ displayOrder: i + 1, updatedAt: new Date() })
+      .where(eq(expenseCategories.id, categoryIds[i]));
+  }
 }
 

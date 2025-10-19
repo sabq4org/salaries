@@ -10,6 +10,7 @@ import {
   TrendingUp, 
   FileText,
   Settings,
+  Settings2,
   HelpCircle,
   X,
   Calendar,
@@ -31,6 +32,7 @@ const menuItems = [
   { icon: Bell, label: "التذكيرات", href: "/reminders" },
   { icon: TrendingUp, label: "الميزانية السنوية", href: "/budget" },
   { icon: FileText, label: "التقارير", href: "/reports" },
+  { icon: Settings2, label: "الإعدادات", href: "/settings" },
 ];
 
 const bottomMenuItems: any[] = [
