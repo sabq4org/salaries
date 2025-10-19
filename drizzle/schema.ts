@@ -225,3 +225,62 @@ export const expenseCategories = pgTable("expense_categories", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
+
+export type ExpenseCategory = typeof expenseCategories.$inferSelect;
+export type InsertExpenseCategory = typeof expenseCategories.$inferInsert;
+
+/**
+ * جدول سجل التدقيق (Audit Log)
+ * يسجل جميع العمليات المالية والتغييرات الحساسة
+ */
+export const auditActionEnum = pgEnum('audit_action', ['CREATE', 'UPDATE', 'DELETE', 'APPROVE', 'REJECT', 'LOCK', 'UNLOCK']);
+export const auditEntityEnum = pgEnum('audit_entity', ['employee', 'contractor', 'payroll', 'expense', 'revenue', 'budget', 'leave_settlement', 'reminder', 'user', 'expense_category']);
+
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  entityType: auditEntityEnum("entityType").notNull(),
+  entityId: integer("entityId").notNull(),
+  action: auditActionEnum("action").notNull(),
+  userId: varchar("userId", { length: 64 }).references(() => users.id),
+  userName: varchar("userName", { length: 255 }),
+  oldData: text("oldData"), // JSON string
+  newData: text("newData"), // JSON string
+  changes: text("changes"), // JSON string - summary of changes
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+
+
+/**
+ * جدول الموافقات المعلقة (Maker/Checker System)
+ * يتتبع العمليات التي تحتاج موافقة قبل التنفيذ
+ */
+export const approvalStatusEnum = pgEnum('approval_status', ['pending', 'approved', 'rejected']);
+export const approvalOperationEnum = pgEnum('approval_operation', ['CREATE', 'UPDATE', 'DELETE']);
+
+export const pendingApprovals = pgTable("pending_approvals", {
+  id: serial("id").primaryKey(),
+  entityType: auditEntityEnum("entityType").notNull(),
+  entityId: integer("entityId"), // null for CREATE operations
+  operation: approvalOperationEnum("operation").notNull(),
+  requestData: text("requestData").notNull(), // JSON string of the requested changes
+  currentData: text("currentData"), // JSON string of current data (for UPDATE/DELETE)
+  status: approvalStatusEnum("status").notNull().default('pending'),
+  makerId: varchar("makerId", { length: 64 }).references(() => users.id),
+  makerName: varchar("makerName", { length: 255 }),
+  checkerId: varchar("checkerId", { length: 64 }).references(() => users.id),
+  checkerName: varchar("checkerName", { length: 255 }),
+  makerComment: text("makerComment"),
+  checkerComment: text("checkerComment"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewedAt"),
+});
+
+export type PendingApproval = typeof pendingApprovals.$inferSelect;
+export type InsertPendingApproval = typeof pendingApprovals.$inferInsert;
+

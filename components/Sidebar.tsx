@@ -12,7 +12,9 @@ import {
   Settings2,
   X,
   Calendar,
-  Bell
+  Bell,
+  Shield,
+  CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -30,6 +32,8 @@ const menuItems = [
   { icon: Bell, label: "التذكيرات", href: "/reminders" },
   { icon: TrendingUp, label: "الميزانية السنوية", href: "/budget" },
   { icon: FileText, label: "التقارير", href: "/reports" },
+  { icon: Shield, label: "سجل التدقيق", href: "/audit-log" },
+  { icon: CheckSquare, label: "الموافقات المعلقة", href: "/pending-approvals" },
   { icon: Settings2, label: "الإعدادات", href: "/settings" },
 ];
 

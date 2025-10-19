@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { expenses } from '@/drizzle/schema';
 import { eq, and } from 'drizzle-orm';
+import { logAudit, getClientIp, getUserAgent } from '@/lib/audit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,6 +61,16 @@ export async function POST(request: NextRequest) {
     
     console.log('POST /api/expenses - Success:', result[0]);
     
+    // تسجيل في audit log
+    await logAudit({
+      entityType: 'expense',
+      entityId: result[0].id,
+      action: 'CREATE',
+      newData: result[0],
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
+    });
+    
     return NextResponse.json(result[0], { status: 201 });
   } catch (error: any) {
     console.error('POST /api/expenses error:', error);
@@ -82,6 +93,9 @@ export async function PUT(request: NextRequest) {
     
     const body = await request.json();
     
+    // الحصول على البيانات القديمة قبل التحديث
+    const oldExpense = await db.select().from(expenses).where(eq(expenses.id, parseInt(id))).limit(1);
+    
     const expenseData: any = { updatedAt: new Date() };
     if (body.year !== undefined) expenseData.year = parseInt(body.year);
     if (body.month !== undefined) expenseData.month = parseInt(body.month);
@@ -97,6 +111,19 @@ export async function PUT(request: NextRequest) {
       .set(expenseData)
       .where(eq(expenses.id, parseInt(id)))
       .returning();
+    
+    // تسجيل في audit log
+    if (oldExpense[0]) {
+      await logAudit({
+        entityType: 'expense',
+        entityId: parseInt(id),
+        action: 'UPDATE',
+        oldData: oldExpense[0],
+        newData: result[0],
+        ipAddress: getClientIp(request),
+        userAgent: getUserAgent(request),
+      });
+    }
       
     return NextResponse.json(result[0]);
   } catch (error) {
@@ -114,7 +141,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
     
+    // الحصول على البيانات قبل الحذف
+    const oldExpense = await db.select().from(expenses).where(eq(expenses.id, parseInt(id))).limit(1);
+    
     await db.delete(expenses).where(eq(expenses.id, parseInt(id)));
+    
+    // تسجيل في audit log
+    if (oldExpense[0]) {
+      await logAudit({
+        entityType: 'expense',
+        entityId: parseInt(id),
+        action: 'DELETE',
+        oldData: oldExpense[0],
+        ipAddress: getClientIp(request),
+        userAgent: getUserAgent(request),
+      });
+    }
     
     return NextResponse.json({ success: true });
   } catch (error) {
