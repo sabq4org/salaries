@@ -36,6 +36,7 @@ interface Expense {
   amount: number;
   date: string;
   notes: string | null;
+  attachmentUrl: string | null;
 }
 
 interface Revenue {
@@ -47,6 +48,7 @@ interface Revenue {
   amount: number;
   date: string;
   notes: string | null;
+  attachmentUrl: string | null;
 }
 
 interface ExpenseCategory {
@@ -81,14 +83,18 @@ export default function QuarterlyBudgetPage() {
     amount: 0,
     date: new Date().toISOString().split('T')[0],
     notes: '',
+    attachmentUrl: '',
   });
+  const [expenseUploading, setExpenseUploading] = useState(false);
 
   const [revenueForm, setRevenueForm] = useState({
     source: '',
     amount: 0,
     date: new Date().toISOString().split('T')[0],
     notes: '',
+    attachmentUrl: '',
   });
+  const [revenueUploading, setRevenueUploading] = useState(false);
 
   useEffect(() => {
     fetchExpenseCategories();
@@ -140,6 +146,69 @@ export default function QuarterlyBudgetPage() {
     }
   };
 
+  const handleFileUpload = async (file: File, type: 'expense' | 'revenue') => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      if (type === 'expense') {
+        setExpenseUploading(true);
+      } else {
+        setRevenueUploading(true);
+      }
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (type === 'expense') {
+          setExpenseForm({ ...expenseForm, attachmentUrl: data.url });
+        } else {
+          setRevenueForm({ ...revenueForm, attachmentUrl: data.url });
+        }
+        toast.success('تم رفع الملف بنجاح');
+        return data.url;
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'فشل في رفع الملف');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('حدث خطأ أثناء رفع الملف');
+      return null;
+    } finally {
+      if (type === 'expense') {
+        setExpenseUploading(false);
+      } else {
+        setRevenueUploading(false);
+      }
+    }
+  };
+
+  const handleFileDelete = async (url: string) => {
+    try {
+      const response = await fetch(`/api/upload?url=${encodeURIComponent(url)}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast.success('تم حذف الملف بنجاح');
+        return true;
+      } else {
+        toast.error('فشل في حذف الملف');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast.error('حدث خطأ أثناء حذف الملف');
+      return false;
+    }
+  };
+
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -158,6 +227,7 @@ export default function QuarterlyBudgetPage() {
           amount: expenseForm.amount,
           date: expenseForm.date,
           notes: expenseForm.notes,
+          attachmentUrl: expenseForm.attachmentUrl,
         }),
       });
 
@@ -170,6 +240,7 @@ export default function QuarterlyBudgetPage() {
           amount: 0,
           date: new Date().toISOString().split('T')[0],
           notes: '',
+          attachmentUrl: '',
         });
         fetchData();
       } else {
@@ -201,6 +272,7 @@ export default function QuarterlyBudgetPage() {
           amount: expenseForm.amount,
           date: expenseForm.date,
           notes: expenseForm.notes,
+          attachmentUrl: expenseForm.attachmentUrl,
         }),
       });
 
@@ -214,6 +286,7 @@ export default function QuarterlyBudgetPage() {
           amount: 0,
           date: new Date().toISOString().split('T')[0],
           notes: '',
+          attachmentUrl: '',
         });
         fetchData();
       } else {
@@ -242,6 +315,7 @@ export default function QuarterlyBudgetPage() {
           amount: revenueForm.amount,
           date: revenueForm.date,
           notes: revenueForm.notes,
+          attachmentUrl: revenueForm.attachmentUrl,
         }),
       });
 
@@ -253,6 +327,7 @@ export default function QuarterlyBudgetPage() {
           amount: 0,
           date: new Date().toISOString().split('T')[0],
           notes: '',
+          attachmentUrl: '',
         });
         fetchData();
       } else {
@@ -283,6 +358,7 @@ export default function QuarterlyBudgetPage() {
           amount: revenueForm.amount,
           date: revenueForm.date,
           notes: revenueForm.notes,
+          attachmentUrl: revenueForm.attachmentUrl,
         }),
       });
 
@@ -295,6 +371,7 @@ export default function QuarterlyBudgetPage() {
           amount: 0,
           date: new Date().toISOString().split('T')[0],
           notes: '',
+          attachmentUrl: '',
         });
         fetchData();
       } else {
@@ -337,6 +414,7 @@ export default function QuarterlyBudgetPage() {
       amount: expense.amount,
       date: new Date(expense.date).toISOString().split('T')[0],
       notes: expense.notes || '',
+      attachmentUrl: expense.attachmentUrl || '',
     });
     setExpenseDialogOpen(true);
   };
@@ -348,6 +426,7 @@ export default function QuarterlyBudgetPage() {
       amount: revenue.amount,
       date: new Date(revenue.date).toISOString().split('T')[0],
       notes: revenue.notes || '',
+      attachmentUrl: revenue.attachmentUrl || '',
     });
     setRevenueDialogOpen(true);
   };
@@ -692,7 +771,49 @@ export default function QuarterlyBudgetPage() {
                 placeholder="ملاحظات إضافية (اختياري)"
               />
             </div>
-            <Button type="submit" className="w-full bg-destructive">
+            <div>
+              <Label>إرفاق ملف (فاتورة أو مستند)</Label>
+              <Input
+                type="file"
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileUpload(file, 'expense');
+                  }
+                }}
+                disabled={expenseUploading}
+                className="mt-1"
+              />
+              {expenseUploading && (
+                <p className="text-sm text-muted-foreground mt-1">جاري رفع الملف...</p>
+              )}
+              {expenseForm.attachmentUrl && (
+                <div className="mt-2 flex items-center gap-2">
+                  <a
+                    href={expenseForm.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    عرض المرفق
+                  </a>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleFileDelete(expenseForm.attachmentUrl);
+                      setExpenseForm({ ...expenseForm, attachmentUrl: '' });
+                    }}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              )}
+            </div>
+            <Button type="submit" className="w-full bg-destructive" disabled={expenseUploading}>
               {editingExpense ? 'تحديث' : 'إضافة'}
             </Button>
           </form>
@@ -741,7 +862,49 @@ export default function QuarterlyBudgetPage() {
                 placeholder="ملاحظات إضافية (اختياري)"
               />
             </div>
-            <Button type="submit" className="w-full bg-green-600">
+            <div>
+              <Label>إرفاق ملف (فاتورة أو مستند)</Label>
+              <Input
+                type="file"
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileUpload(file, 'revenue');
+                  }
+                }}
+                disabled={revenueUploading}
+                className="mt-1"
+              />
+              {revenueUploading && (
+                <p className="text-sm text-muted-foreground mt-1">جاري رفع الملف...</p>
+              )}
+              {revenueForm.attachmentUrl && (
+                <div className="mt-2 flex items-center gap-2">
+                  <a
+                    href={revenueForm.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    عرض المرفق
+                  </a>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleFileDelete(revenueForm.attachmentUrl);
+                      setRevenueForm({ ...revenueForm, attachmentUrl: '' });
+                    }}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              )}
+            </div>
+            <Button type="submit" className="w-full bg-green-600" disabled={revenueUploading}>
               {editingRevenue ? 'تحديث' : 'إضافة'}
             </Button>
           </form>

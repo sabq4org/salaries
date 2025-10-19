@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
       amount: parseInt(body.amount) || 0,
       date: body.date ? new Date(body.date) : new Date(),
       notes: body.notes || null,
+      attachmentUrl: body.attachmentUrl || null,
     };
     
     console.log('POST /api/expenses - Inserting:', expenseData);
@@ -90,6 +91,7 @@ export async function PUT(request: NextRequest) {
     if (body.amount !== undefined) expenseData.amount = parseInt(body.amount);
     if (body.date !== undefined) expenseData.date = new Date(body.date);
     if (body.notes !== undefined) expenseData.notes = body.notes;
+    if (body.attachmentUrl !== undefined) expenseData.attachmentUrl = body.attachmentUrl;
     
     const result = await db.update(expenses)
       .set(expenseData)

@@ -108,6 +108,7 @@ export const expenses = pgTable("expenses", {
   amount: integer("amount").notNull().default(0),
   date: timestamp("date").notNull().defaultNow(),
   notes: text("notes"),
+  attachmentUrl: text("attachmentUrl"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -127,6 +128,7 @@ export const revenues = pgTable("revenues", {
   amount: integer("amount").notNull().default(0),
   date: timestamp("date").notNull().defaultNow(),
   notes: text("notes"),
+  attachmentUrl: text("attachmentUrl"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { year, month, quarter, source, amount, date, notes } = body;
+    const { year, month, quarter, source, amount, date, notes, attachmentUrl } = body;
 
     const result = await db.insert(revenues).values({
       year,
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       amount,
       date: date ? new Date(date) : new Date(),
       notes,
+      attachmentUrl: attachmentUrl || null,
     }).returning();
 
     return NextResponse.json(result[0]);
@@ -65,7 +66,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { year, month, quarter, source, amount, date, notes } = body;
+    const { year, month, quarter, source, amount, date, notes, attachmentUrl } = body;
 
     const result = await db.update(revenues)
       .set({
@@ -76,6 +77,7 @@ export async function PUT(request: NextRequest) {
         amount,
         date: date ? new Date(date) : undefined,
         notes,
+        attachmentUrl: attachmentUrl !== undefined ? attachmentUrl : undefined,
         updatedAt: new Date(),
       })
       .where(eq(revenues.id, parseInt(id)))
