@@ -37,6 +37,7 @@ interface Employee {
   position: string | null;
   baseSalary: number;
   socialInsurance: number;
+  leaveBalance: number;
   sortOrder: number;
   isActive: boolean;
 }
@@ -51,6 +52,7 @@ export default function EmployeesPage() {
     position: "",
     baseSalary: 0,
     socialInsurance: 0,
+    leaveBalance: 0,
   });
 
   const sensors = useSensors(
@@ -128,7 +130,7 @@ export default function EmployeesPage() {
       toast.success(editingId ? 'تم تحديث الموظف بنجاح' : 'تم إضافة الموظف بنجاح');
       setOpen(false);
       setEditingId(null);
-      setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
+      setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0, leaveBalance: 0 });
       fetchEmployees();
     } catch (error) {
       console.error('Error:', error);
@@ -143,6 +145,7 @@ export default function EmployeesPage() {
       position: employee.position || "",
       baseSalary: employee.baseSalary,
       socialInsurance: employee.socialInsurance,
+      leaveBalance: employee.leaveBalance || 0,
     });
     setOpen(true);
   };
@@ -193,7 +196,7 @@ export default function EmployeesPage() {
             <Button 
               onClick={() => {
                 setEditingId(null);
-                setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0 });
+                setFormData({ name: "", position: "", baseSalary: 0, socialInsurance: 0, leaveBalance: 0 });
               }}
               style={{ backgroundColor: '#2563eb' }}
               className="text-white hover:opacity-90"
@@ -248,6 +251,18 @@ export default function EmployeesPage() {
                   onChange={(e) => setFormData({ ...formData, socialInsurance: parseInt(e.target.value) || 0 })}
                   required
                   className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="leaveBalance">رصيد الإجازات (أيام)</Label>
+                <Input
+                  id="leaveBalance"
+                  type="number"
+                  value={formData.leaveBalance}
+                  onChange={(e) => setFormData({ ...formData, leaveBalance: parseInt(e.target.value) || 0 })}
+                  required
+                  className="mt-1"
+                  placeholder="عدد أيام الإجازات المستحقة"
                 />
               </div>
               <div className="flex gap-2 pt-4">

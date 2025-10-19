@@ -27,6 +27,7 @@ export const employees = pgTable("employees", {
   position: varchar("position", { length: 255 }),
   baseSalary: integer("baseSalary").notNull().default(0),
   socialInsurance: integer("socialInsurance").notNull().default(0),
+  leaveBalance: integer("leaveBalance").notNull().default(0),
   sortOrder: integer("sortOrder").notNull().default(0),
   isActive: boolean("isActive").notNull().default(true),
   createdAt: timestamp("createdAt").defaultNow(),

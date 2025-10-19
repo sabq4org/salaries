@@ -35,6 +35,7 @@ interface Employee {
   id: number;
   name: string;
   position: string | null;
+  leaveBalance: number;
 }
 
 interface LeaveSettlement {
@@ -230,7 +231,13 @@ export default function LeaveSettlementPage() {
                     <Label htmlFor="employee">الموظف *</Label>
                     <Select
                       value={selectedEmployeeId}
-                      onValueChange={setSelectedEmployeeId}
+                      onValueChange={(value) => {
+                        setSelectedEmployeeId(value);
+                        const emp = employees.find(e => e.id.toString() === value);
+                        if (emp && emp.leaveBalance > 0) {
+                          setPreviousBalanceDays(emp.leaveBalance.toString());
+                        }
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الموظف" />
@@ -238,11 +245,16 @@ export default function LeaveSettlementPage() {
                       <SelectContent>
                         {employees.map((emp) => (
                           <SelectItem key={emp.id} value={emp.id.toString()}>
-                            {emp.name} - {emp.position || "بدون منصب"}
+                            {emp.name} - {emp.position || "بدون منصب"} {emp.leaveBalance > 0 && `(الرصيد: ${emp.leaveBalance} يوم)`}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {selectedEmployeeId && employees.find(e => e.id.toString() === selectedEmployeeId) && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        الرصيد الحالي: {employees.find(e => e.id.toString() === selectedEmployeeId)?.leaveBalance || 0} يوم
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
