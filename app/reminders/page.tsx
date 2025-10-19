@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -273,6 +274,9 @@ export default function RemindersPage() {
                 <DialogTitle className="text-2xl">
                   {editingId ? "تعديل تذكير" : "إضافة تذكير جديد"}
                 </DialogTitle>
+                <DialogDescription>
+                  قم بإدخال تفاصيل التذكير والموعد المطلوب
+                </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4">
