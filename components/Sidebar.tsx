@@ -15,7 +15,8 @@ import {
   Bell,
   Shield,
   CheckSquare,
-  Lock
+  Lock,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: Bell, label: "التذكيرات", href: "/reminders" },
   { icon: TrendingUp, label: "الميزانية السنوية", href: "/budget" },
   { icon: FileText, label: "التقارير", href: "/reports" },
+  { icon: BookOpen, label: "دفتر الأستاذ", href: "/employee-ledger" },
   { icon: Shield, label: "سجل التدقيق", href: "/audit-log" },
   { icon: CheckSquare, label: "الموافقات المعلقة", href: "/pending-approvals" },
   { icon: Lock, label: "إدارة الفترات المالية", href: "/period-locks" },
