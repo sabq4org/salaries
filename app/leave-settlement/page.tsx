@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Calendar as CalendarIcon, FileText, Users, TrendingUp } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, FileText, Users, TrendingUp, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -67,6 +67,8 @@ export default function LeaveSettlementPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [calculating, setCalculating] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Form state
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
@@ -182,7 +184,109 @@ export default function LeaveSettlementPage() {
 
   const handleAddNew = () => {
     handleReset();
+    setEditingId(null);
     setOpen(true);
+  };
+
+  const handleEdit = (settlement: LeaveSettlement) => {
+    setEditingId(settlement.id);
+    setSelectedEmployeeId(settlement.employeeId.toString());
+    setJoinDate(new Date(settlement.joinDate));
+    setLeaveStartDate(new Date(settlement.leaveStartDate));
+    if (settlement.leaveEndDate) {
+      setLeaveEndDate(new Date(settlement.leaveEndDate));
+      setInputMethod("endDate");
+    } else if (settlement.leaveDays) {
+      setLeaveDays(settlement.leaveDays.toString());
+      setInputMethod("days");
+    }
+    setPreviousBalanceDays(settlement.previousBalanceDays.toString());
+    setTicketsEntitlement(settlement.ticketsEntitlement);
+    setVisasCount(settlement.visasCount.toString());
+    setDeductionsAmount(settlement.deductionsAmount.toString());
+    setOpen(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!editingId) return;
+
+    if (!selectedEmployeeId || !joinDate || !leaveStartDate) {
+      toast.error("يرجى ملء جميع الحقول المطلوبة");
+      return;
+    }
+
+    if (inputMethod === "days" && !leaveDays) {
+      toast.error("يرجى إدخال مدة الإجازة");
+      return;
+    }
+
+    if (inputMethod === "endDate" && !leaveEndDate) {
+      toast.error("يرجى اختيار تاريخ نهاية الإجازة");
+      return;
+    }
+
+    try {
+      setCalculating(true);
+
+      const payload = {
+        id: editingId,
+        employeeId: parseInt(selectedEmployeeId),
+        joinDate: joinDate.toISOString(),
+        leaveStartDate: leaveStartDate.toISOString(),
+        ...(inputMethod === "days"
+          ? { leaveDays: parseInt(leaveDays), leaveEndDate: null }
+          : { leaveEndDate: leaveEndDate!.toISOString(), leaveDays: null }),
+        previousBalanceDays: parseInt(previousBalanceDays),
+        ticketsEntitlement,
+        visasCount: parseInt(visasCount),
+        deductionsAmount: parseInt(deductionsAmount),
+      };
+
+      const response = await fetch("/api/leave-settlements", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("فشل في تحديث التصفية");
+      }
+
+      toast.success("تم تحديث التصفية بنجاح");
+      setOpen(false);
+      handleReset();
+      fetchSettlements();
+    } catch (error: any) {
+      console.error("Error updating settlement:", error);
+      toast.error(error.message || "فشل في تحديث التصفية");
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("هل أنت متأكد من حذف هذه التصفية؟")) {
+      return;
+    }
+
+    try {
+      setDeletingId(id);
+      const response = await fetch(`/api/leave-settlements?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("فشل في حذف التصفية");
+      }
+
+      toast.success("تم حذف التصفية بنجاح");
+      fetchSettlements();
+    } catch (error: any) {
+      console.error("Error deleting settlement:", error);
+      toast.error(error.message || "فشل في حذف التصفية");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   // Calculate statistics
@@ -217,10 +321,10 @@ export default function LeaveSettlementPage() {
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-2xl">
-                  إضافة تصفية إجازة جديدة
+                  {editingId ? "تعديل تصفية إجازة" : "إضافة تصفية إجازة جديدة"}
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground">
-                  أدخل بيانات الموظف والإجازة لحساب الاستحقاق
+                  {editingId ? "تحديث بيانات التصفية" : "أدخل بيانات الموظف والإجازة لحساب الاستحقاق"}
                 </p>
               </DialogHeader>
 
@@ -444,11 +548,15 @@ export default function LeaveSettlementPage() {
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
                   <Button
-                    onClick={handleCalculate}
+                    onClick={editingId ? handleUpdate : handleCalculate}
                     disabled={calculating}
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
                   >
-                    {calculating ? "جاري الحساب..." : "احسب الاستحقاق"}
+                    {calculating ? (
+                      editingId ? "جاري التحديث..." : "جاري الحساب..."
+                    ) : (
+                      editingId ? "تحديث التصفية" : "احسب الاستحقاق"
+                    )}
                   </Button>
                   <Button
                     onClick={handleReset}
@@ -620,6 +728,9 @@ export default function LeaveSettlementPage() {
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">
                       صافي المستحق
                     </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                      الإجراءات
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -654,6 +765,31 @@ export default function LeaveSettlementPage() {
                       </td>
                       <td className="px-6 py-4 text-sm font-bold text-green-600">
                         {settlement.netPayable.toLocaleString()} ر.س
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            onClick={() => handleEdit(settlement)}
+                            variant="outline"
+                            size="sm"
+                            className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(settlement.id)}
+                            variant="outline"
+                            size="sm"
+                            disabled={deletingId === settlement.id}
+                            className="hover:bg-red-50 hover:text-red-600 hover:border-red-600 transition-colors"
+                          >
+                            {deletingId === settlement.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
