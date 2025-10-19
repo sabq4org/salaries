@@ -17,8 +17,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+.dark {
+  --background: #1a1a1a;
+  --foreground: #f5f5f5;
+  --card: #262626;
+  --card-border: #333333;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #1a1a1a;
     --foreground: #f5f5f5;
     --card: #262626;
