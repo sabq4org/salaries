@@ -309,3 +309,27 @@ export const periodLocks = pgTable("period_locks", {
 export type PeriodLock = typeof periodLocks.$inferSelect;
 export type InsertPeriodLock = typeof periodLocks.$inferInsert;
 
+
+
+/**
+ * جدول إعدادات النظام
+ * يخزن الإعدادات القابلة للتخصيص مثل معدلات التأمينات والضرائب
+ */
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 255 }).notNull().unique(),
+  value: text("value").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // insurance, tax, leave, deduction, etc.
+  label: varchar("label", { length: 255 }).notNull(),
+  description: text("description"),
+  dataType: varchar("dataType", { length: 50 }).notNull().default('string'), // string, number, boolean, json
+  isEditable: boolean("isEditable").notNull().default(true),
+  updatedBy: varchar("updatedBy", { length: 64 }).references(() => users.id),
+  updatedByName: varchar("updatedByName", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;
+

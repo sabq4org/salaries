@@ -36,7 +36,7 @@ const menuItems = [
   { icon: Shield, label: "سجل التدقيق", href: "/audit-log" },
   { icon: CheckSquare, label: "الموافقات المعلقة", href: "/pending-approvals" },
   { icon: Lock, label: "إدارة الفترات المالية", href: "/period-locks" },
-  { icon: Settings2, label: "الإعدادات", href: "/settings" },
+  { icon: Settings2, label: "إعدادات النظام", href: "/system-settings" },
 ];
 
 const bottomMenuItems: any[] = [
