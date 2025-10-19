@@ -12,11 +12,11 @@ interface StatsCardProps {
 }
 
 const colorClasses = {
-  blue: { bg: "#eff6ff", text: "#2563eb" },
-  green: { bg: "#f0fdf4", text: "#16a34a" },
-  purple: { bg: "#faf5ff", text: "#9333ea" },
-  red: { bg: "#fef2f2", text: "#dc2626" },
-  orange: { bg: "#fff7ed", text: "#ea580c" },
+  blue: "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+  green: "bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400",
+  purple: "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400",
+  red: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
+  orange: "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
 };
 
 export default function StatsCard({ 
@@ -26,43 +26,21 @@ export default function StatsCard({
   trend,
   color = "blue" 
 }: StatsCardProps) {
-  const colors = colorClasses[color];
+  const iconColorClass = colorClasses[color];
   
   return (
-    <div 
-      className="p-6 rounded-xl hover:shadow-md transition-all duration-200 cursor-pointer"
-      className="bg-card border border-border"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">
-            {title}
-          </p>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            {value}
-          </h3>
+    <div className="p-6 rounded-xl bg-card border border-border transition-colors">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground mb-1">{title}</p>
+          <p className="text-2xl font-bold text-foreground">{value}</p>
           {trend && (
-            <div className="flex items-center gap-1">
-              <span 
-                className="text-xs font-medium"
-                style={{ color: trend.isPositive ? '#16a34a' : '#dc2626' }}
-              >
-                {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-              </span>
-              <span className="text-xs text-gray-500">
-                من الشهر الماضي
-              </span>
-            </div>
+            <p className={`text-xs mt-1 ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}% من الشهر الماضي
+            </p>
           )}
         </div>
-        
-        <div 
-          className="w-12 h-12 rounded-xl flex items-center justify-center"
-          style={{
-            backgroundColor: colors.bg,
-            color: colors.text
-          }}
-        >
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconColorClass}`}>
           <Icon className="h-6 w-6" />
         </div>
       </div>

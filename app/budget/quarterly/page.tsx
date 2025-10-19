@@ -437,8 +437,8 @@ export default function QuarterlyBudgetPage() {
                 onClick={() => setSelectedQuarter(quarter.id)}
                 className={`p-6 rounded-xl text-right transition-all ${
                   isSelected
-                    ? 'bg-blue-50 border-2 border-blue-500'
-                    : 'bg-white border border-border hover:border-blue-300'
+                    ? 'bg-blue-50 dark:bg-blue-950 border-2 border-blue-500'
+                    : 'bg-card border border-border hover:border-blue-300'
                 }`}
               >
                 <h3 className="text-lg font-bold text-foreground mb-1">{quarter.name}</h3>

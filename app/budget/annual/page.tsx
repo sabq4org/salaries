@@ -253,7 +253,7 @@ export default function AnnualBudgetPage() {
                     <span className="font-semibold">{typeLabels[type]}</span>
                     <span className="text-muted-foreground">{amount.toLocaleString()} ر.س ({percentage}%)</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="w-full bg-muted rounded-full h-3">
                     <div
                       className="bg-blue-600 h-3 rounded-full transition-all"
                       style={{ width: `${percentage}%` }}

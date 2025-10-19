@@ -279,28 +279,19 @@ export default function EmployeesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div 
-          className="p-6 rounded-xl"
-          className="bg-card border border-border"
-        >
+        <div className="p-6 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">إجمالي الموظفين</p>
               <p className="text-3xl font-bold text-foreground">{employees.length}</p>
             </div>
-            <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center"
-              className="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
-            >
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
               <Users className="h-6 w-6" />
             </div>
           </div>
         </div>
 
-        <div 
-          className="p-6 rounded-xl"
-          className="bg-card border border-border"
-        >
+        <div className="p-6 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
@@ -311,10 +302,7 @@ export default function EmployeesPage() {
           </div>
         </div>
 
-        <div 
-          className="p-6 rounded-xl"
-          className="bg-card border border-border"
-        >
+        <div className="p-6 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">إجمالي التأمينات</p>
@@ -327,10 +315,7 @@ export default function EmployeesPage() {
       </div>
 
       {/* Table */}
-      <div 
-        className="rounded-xl overflow-hidden"
-        className="bg-card border border-border"
-      >
+      <div className="rounded-xl overflow-hidden bg-card border border-border">
         <div className="overflow-x-auto">
           <DndContext
             sensors={sensors}

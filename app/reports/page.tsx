@@ -108,73 +108,49 @@ export default function ReportsPage() {
 
         {/* Main Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div 
-            className="p-6 rounded-xl"
-            className="bg-card border border-border"
-          >
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">إجمالي الموظفين</p>
                 <p className="text-3xl font-bold text-foreground">{employees.length}</p>
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                className="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
-              >
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
                 <Users className="h-6 w-6" />
               </div>
             </div>
           </div>
 
-          <div 
-            className="p-6 rounded-xl"
-            className="bg-card border border-border"
-          >
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">إجمالي المتعاونين</p>
                 <p className="text-3xl font-bold text-foreground">{contractors.length}</p>
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                className="bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400"
-              >
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400">
                 <Users className="h-6 w-6" />
               </div>
             </div>
           </div>
 
-          <div 
-            className="p-6 rounded-xl"
-            className="bg-card border border-border"
-          >
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
                 <p className="text-2xl font-bold text-foreground">{totalPayroll.toLocaleString()} ر.س</p>
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                className="bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
-              >
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400">
                 <DollarSign className="h-6 w-6" />
               </div>
             </div>
           </div>
 
-          <div 
-            className="p-6 rounded-xl"
-            className="bg-card border border-border"
-          >
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">إجمالي المصروفات</p>
                 <p className="text-2xl font-bold text-foreground">{totalCost.toLocaleString()} ر.س</p>
               </div>
-              <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                className="bg-yellow-50 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-600"
-              >
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400">
                 <TrendingUp className="h-6 w-6" />
               </div>
             </div>
