@@ -60,8 +60,8 @@ export default function LoginPage() {
           >
             <Lock className="h-8 w-8" style={{ color: '#2563eb' }} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">نظام الرواتب</h1>
-          <p className="text-gray-600">صحيفة سبق</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">نظام الرواتب</h1>
+          <p className="text-muted-foreground">صحيفة سبق</p>
         </div>
 
         {/* Login Form */}
@@ -108,7 +108,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-muted-foreground"
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -131,7 +131,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             © 2025 صحيفة سبق. جميع الحقوق محفوظة.
           </p>
         </div>

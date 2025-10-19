@@ -70,7 +70,7 @@ export default function HomePage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#2563eb' }}></div>
-            <p className="text-gray-600">جاري تحميل البيانات...</p>
+            <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -80,10 +80,10 @@ export default function HomePage() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           لوحة التحكم
         </h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           نظرة عامة على الموظفين والرواتب والميزانية
         </p>
       </div>
@@ -173,11 +173,7 @@ function SectionCard({ href, icon: Icon, title, description, color }: any) {
   return (
     <Link href={href}>
       <div 
-        className="p-6 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer group h-full"
-        style={{
-          backgroundColor: '#ffffff',
-          border: '1px solid #f0f0ef'
-        }}
+        className="p-6 rounded-xl hover:shadow-lg transition-all duration-200 cursor-pointer group h-full bg-card border border-border"
       >
         <div 
           className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
@@ -188,10 +184,10 @@ function SectionCard({ href, icon: Icon, title, description, color }: any) {
         >
           <Icon className="h-6 w-6" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-blue-600 transition-colors">
           {title}
         </h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           {description}
         </p>
         <div className="flex items-center gap-2 text-blue-600 text-sm font-medium">

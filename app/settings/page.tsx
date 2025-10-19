@@ -174,11 +174,11 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground dark:text-white flex items-center gap-3">
               <Settings2 className="w-8 h-8 text-purple-600" />
               الإعدادات
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-muted-foreground dark:text-gray-400 mt-2">
               إدارة إعدادات النظام والبنود والتصنيفات
             </p>
           </div>
@@ -318,13 +318,13 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 rounded-xl p-6 border border-border dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-muted-foreground dark:text-gray-400 text-sm font-medium">
                   البنود المعطلة
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                <p className="text-3xl font-bold text-foreground dark:text-gray-100 mt-2">
                   {categories.filter((c) => !c.isActive).length}
                 </p>
               </div>
@@ -334,49 +334,49 @@ export default function SettingsPage() {
         </div>
 
         {/* Categories Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="bg-card dark:bg-gray-800 rounded-xl shadow-sm border border-border dark:border-gray-700">
+          <div className="p-6 border-b border-border dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-foreground dark:text-white">
               بنود المصروفات
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
               إدارة بنود المصروفات المستخدمة في الميزانية
             </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-900/50">
+              <thead className="bg-accent dark:bg-gray-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     الترتيب
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     اللون
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     الاسم
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     الوصف
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     الحالة
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground dark:text-gray-400 uppercase tracking-wider">
                     الإجراءات
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="bg-card dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {categories.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <Settings2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-muted-foreground dark:text-gray-400">
                         لا توجد بنود
                       </p>
-                      <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                      <p className="text-sm text-gray-400 dark:text-muted-foreground mt-1">
                         ابدأ بإضافة بند جديد
                       </p>
                     </td>
@@ -385,7 +385,7 @@ export default function SettingsPage() {
                   categories.map((category) => (
                     <tr
                       key={category.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      className="hover:bg-accent dark:hover:bg-gray-700/50 transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <GripVertical className="w-5 h-5 text-gray-400 cursor-move" />
@@ -398,18 +398,18 @@ export default function SettingsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="text-sm font-medium text-foreground dark:text-white">
                             {category.name}
                           </div>
                           {category.nameEn && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="text-xs text-muted-foreground dark:text-gray-400">
                               {category.nameEn}
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                        <div className="text-sm text-muted-foreground dark:text-gray-400 max-w-xs truncate">
                           {category.description || "-"}
                         </div>
                       </td>

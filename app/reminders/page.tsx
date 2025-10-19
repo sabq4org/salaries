@@ -254,8 +254,8 @@ export default function RemindersPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">التذكيرات</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">التذكيرات</h1>
+            <p className="text-muted-foreground mt-1">
               إدارة التنبيهات المهمة والمواعيد القادمة
             </p>
           </div>
@@ -484,12 +484,12 @@ export default function RemindersPage() {
         </div>
 
         {/* Reminders List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">
+        <div className="bg-card rounded-xl shadow-sm border border-border">
+          <div className="p-6 border-b border-border">
+            <h2 className="text-xl font-bold text-foreground">
               جميع التذكيرات
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               التذكيرات مرتبة حسب تاريخ الاستحقاق
             </p>
           </div>
@@ -498,13 +498,13 @@ export default function RemindersPage() {
             {loading ? (
               <div className="p-12 text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">جاري التحميل...</p>
+                <p className="text-muted-foreground mt-4">جاري التحميل...</p>
               </div>
             ) : reminders.length === 0 ? (
               <div className="p-12 text-center">
                 <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg">لا توجد تذكيرات</p>
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-muted-foreground text-lg">لا توجد تذكيرات</p>
+                <p className="text-muted-foreground text-sm mt-2">
                   ابدأ بإضافة تذكير جديد
                 </p>
               </div>
@@ -566,7 +566,7 @@ export default function RemindersPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleComplete(reminder.id)}
-                                className="hover:bg-white/50"
+                                className="hover:bg-card/50"
                               >
                                 <CheckCircle2 className="w-4 h-4" />
                               </Button>
@@ -574,7 +574,7 @@ export default function RemindersPage() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEdit(reminder)}
-                                className="hover:bg-white/50"
+                                className="hover:bg-card/50"
                               >
                                 تعديل
                               </Button>
@@ -584,7 +584,7 @@ export default function RemindersPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDelete(reminder.id)}
-                            className="hover:bg-white/50 text-red-600"
+                            className="hover:bg-card/50 text-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

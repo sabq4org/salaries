@@ -404,7 +404,7 @@ export default function QuarterlyBudgetPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">الميزانية الربعية</h1>
-            <p className="text-gray-600 mt-1">إدارة المصروفات والإيرادات الربعية</p>
+            <p className="text-muted-foreground mt-1">إدارة المصروفات والإيرادات الربعية</p>
           </div>
           <Link href="/budget/annual">
             <Button variant="outline">
@@ -438,11 +438,11 @@ export default function QuarterlyBudgetPage() {
                 className={`p-6 rounded-xl text-right transition-all ${
                   isSelected
                     ? 'bg-blue-50 border-2 border-blue-500'
-                    : 'bg-white border border-gray-200 hover:border-blue-300'
+                    : 'bg-white border border-border hover:border-blue-300'
                 }`}
               >
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{quarter.name}</h3>
-                <p className="text-sm text-gray-600">{quarter.months}</p>
+                <h3 className="text-lg font-bold text-foreground mb-1">{quarter.name}</h3>
+                <p className="text-sm text-muted-foreground">{quarter.months}</p>
               </button>
             );
           })}
@@ -450,12 +450,12 @@ export default function QuarterlyBudgetPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي الإيرادات</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي الإيرادات</p>
                 <p className="text-2xl font-bold text-green-600">{totalRevenues.toLocaleString()} ر.س</p>
-                <p className="text-xs text-gray-500 mt-1">{revenues.length} عملية</p>
+                <p className="text-xs text-muted-foreground mt-1">{revenues.length} عملية</p>
               </div>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-100">
                 <TrendingUp className="h-6 w-6 text-green-600" />
@@ -463,12 +463,12 @@ export default function QuarterlyBudgetPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي المصروفات</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي المصروفات</p>
                 <p className="text-2xl font-bold text-red-600">{totalExpenses.toLocaleString()} ر.س</p>
-                <p className="text-xs text-gray-500 mt-1">{expenses.length} عملية</p>
+                <p className="text-xs text-muted-foreground mt-1">{expenses.length} عملية</p>
               </div>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-red-100">
                 <TrendingDown className="h-6 w-6 text-red-600" />
@@ -476,14 +476,14 @@ export default function QuarterlyBudgetPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">الصافي</p>
+                <p className="text-sm text-muted-foreground mb-1">الصافي</p>
                 <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
                   {netBalance.toLocaleString()} ر.س
                 </p>
-                <p className="text-xs text-gray-500 mt-1">{netBalance >= 0 ? 'فائض' : 'عجز'}</p>
+                <p className="text-xs text-muted-foreground mt-1">{netBalance >= 0 ? 'فائض' : 'عجز'}</p>
               </div>
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${netBalance >= 0 ? 'bg-blue-100' : 'bg-red-100'}`}>
                 <DollarSign className={`h-6 w-6 ${netBalance >= 0 ? 'text-blue-600' : 'text-red-600'}`} />
@@ -499,7 +499,7 @@ export default function QuarterlyBudgetPage() {
             className={`px-6 py-3 font-semibold transition-all ${
               activeTab === 'expenses'
                 ? 'text-red-600 border-b-2 border-red-600'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             المصروفات
@@ -509,7 +509,7 @@ export default function QuarterlyBudgetPage() {
             className={`px-6 py-3 font-semibold transition-all ${
               activeTab === 'revenues'
                 ? 'text-green-600 border-b-2 border-green-600'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             الإيرادات
@@ -517,7 +517,7 @@ export default function QuarterlyBudgetPage() {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold">
               {activeTab === 'expenses' ? `المصروفات - ${quarters[selectedQuarter - 1].name}` : `الإيرادات - ${quarters[selectedQuarter - 1].name}`}
@@ -547,7 +547,7 @@ export default function QuarterlyBudgetPage() {
                   </thead>
                   <tbody>
                     {expenses.map((expense) => (
-                      <tr key={expense.id} className="border-b hover:bg-gray-50">
+                      <tr key={expense.id} className="border-b hover:bg-accent">
                         <td className="py-3 px-4">{new Date(expense.date).toLocaleDateString('ar-SA')}</td>
                         <td className="py-3 px-4">{getCategoryDisplay(expense.type)}</td>
                         <td className="py-3 px-4">{expense.description || '-'}</td>
@@ -578,7 +578,7 @@ export default function QuarterlyBudgetPage() {
                 </table>
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">لا توجد مصروفات مسجلة لهذا الربع</p>
+              <p className="text-center text-muted-foreground py-8">لا توجد مصروفات مسجلة لهذا الربع</p>
             )
           ) : (
             revenues.length > 0 ? (
@@ -595,7 +595,7 @@ export default function QuarterlyBudgetPage() {
                   </thead>
                   <tbody>
                     {revenues.map((revenue) => (
-                      <tr key={revenue.id} className="border-b hover:bg-gray-50">
+                      <tr key={revenue.id} className="border-b hover:bg-accent">
                         <td className="py-3 px-4">{new Date(revenue.date).toLocaleDateString('ar-SA')}</td>
                         <td className="py-3 px-4">{revenue.source}</td>
                         <td className="py-3 px-4 font-semibold">{revenue.amount.toLocaleString()} ر.س</td>
@@ -626,7 +626,7 @@ export default function QuarterlyBudgetPage() {
                 </table>
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">لا توجد إيرادات مسجلة لهذا الربع</p>
+              <p className="text-center text-muted-foreground py-8">لا توجد إيرادات مسجلة لهذا الربع</p>
             )
           )}
         </div>

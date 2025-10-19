@@ -281,8 +281,8 @@ export default function PayrollPage() {
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">مسير الرواتب الشهرية</h1>
-            <p className="text-gray-600 mt-2">إدارة رواتب الموظفين والمتعاونين</p>
+            <h1 className="text-3xl font-bold text-foreground">مسير الرواتب الشهرية</h1>
+            <p className="text-muted-foreground mt-2">إدارة رواتب الموظفين والمتعاونين</p>
           </div>
           
           {/* Export Buttons */}
@@ -333,59 +333,59 @@ export default function PayrollPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
                 <UserCheck className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">رواتب الموظفين</p>
-                <p className="text-2xl font-bold text-gray-900">{totalEmployeeSalaries.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground">رواتب الموظفين</p>
+                <p className="text-2xl font-bold text-foreground">{totalEmployeeSalaries.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-100 rounded-lg">
                 <Users className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">رواتب المتعاونين</p>
-                <p className="text-2xl font-bold text-gray-900">{totalContractorSalaries.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground">رواتب المتعاونين</p>
+                <p className="text-2xl font-bold text-foreground">{totalContractorSalaries.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-purple-100 rounded-lg">
                 <DollarSign className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">الإجمالي الشامل</p>
-                <p className="text-2xl font-bold text-gray-900">{grandTotal.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground">الإجمالي الشامل</p>
+                <p className="text-2xl font-bold text-foreground">{grandTotal.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+          <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-orange-100 rounded-lg">
                 <Shield className="w-6 h-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">مجموع التأمينات</p>
-                <p className="text-2xl font-bold text-gray-900">{totalSocialInsurance.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground">مجموع التأمينات</p>
+                <p className="text-2xl font-bold text-foreground">{totalSocialInsurance.toLocaleString()} ر.س</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Employee Payrolls Section */}
-        <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+        <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">رواتب الموظفين الرسميين</h2>
+            <h2 className="text-xl font-bold text-foreground">رواتب الموظفين الرسميين</h2>
             <Dialog open={openEmployee} onOpenChange={setOpenEmployee}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700">
@@ -489,7 +489,7 @@ export default function PayrollPage() {
           </div>
 
           {employeePayrolls.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">لا توجد بيانات لهذا الشهر</p>
+            <p className="text-center text-muted-foreground py-8">لا توجد بيانات لهذا الشهر</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -508,13 +508,13 @@ export default function PayrollPage() {
                 <tbody>
                   {employeePayrolls.map((payroll) => (
                     <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.employeeName}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{payroll.position}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.baseSalary.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.socialInsurance.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.bonus.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{payroll.netSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.employeeName}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{payroll.position}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.baseSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.socialInsurance.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.deduction.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.bonus.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-foreground">{payroll.netSalary.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
                           <button
@@ -534,9 +534,9 @@ export default function PayrollPage() {
         </div>
 
         {/* Contractor Payrolls Section */}
-        <div className="bg-white rounded-xl border border-[#f0f0ef] p-6">
+        <div className="bg-card rounded-xl border border-[#f0f0ef] p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">رواتب المتعاونين</h2>
+            <h2 className="text-xl font-bold text-foreground">رواتب المتعاونين</h2>
             <Dialog open={openContractor} onOpenChange={setOpenContractor}>
               <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700">
@@ -630,7 +630,7 @@ export default function PayrollPage() {
           </div>
 
           {contractorPayrolls.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">لا توجد بيانات لهذا الشهر</p>
+            <p className="text-center text-muted-foreground py-8">لا توجد بيانات لهذا الشهر</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -648,12 +648,12 @@ export default function PayrollPage() {
                 <tbody>
                   {contractorPayrolls.map((payroll) => (
                     <tr key={payroll.id} style={{ borderBottom: '1px solid #f0f0ef' }}>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.contractorName}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{payroll.position}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.salary.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.deduction.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{payroll.bonus.toLocaleString()} ر.س</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{payroll.netSalary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.contractorName}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{payroll.position}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.salary.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.deduction.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{payroll.bonus.toLocaleString()} ر.س</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-foreground">{payroll.netSalary.toLocaleString()} ر.س</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
                           <button

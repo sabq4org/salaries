@@ -38,15 +38,15 @@ export function SortableRow({ contractor, index, onEdit, onDelete }: SortableRow
   };
 
   return (
-    <tr ref={setNodeRef} style={style} className="hover:bg-gray-50 transition-colors">
+    <tr ref={setNodeRef} style={style} className="hover:bg-accent transition-colors">
       <td className="p-4">
         <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
           <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
       </td>
-      <td className="p-4 text-gray-900 font-medium">{contractor.name}</td>
-      <td className="p-4 text-gray-600">{contractor.position || '-'}</td>
-      <td className="p-4 text-gray-900">{contractor.salary.toLocaleString()} ر.س</td>
+      <td className="p-4 text-foreground font-medium">{contractor.name}</td>
+      <td className="p-4 text-muted-foreground">{contractor.position || '-'}</td>
+      <td className="p-4 text-foreground">{contractor.salary.toLocaleString()} ر.س</td>
       <td className="p-4">
         <div className="flex items-center justify-center gap-2">
           <Button

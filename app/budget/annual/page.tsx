@@ -118,8 +118,8 @@ export default function AnnualBudgetPage() {
       <div className="p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">الميزانية السنوية</h1>
-            <p className="text-gray-600">ملخص شامل للإيرادات والمصروفات السنوية</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">الميزانية السنوية</h1>
+            <p className="text-muted-foreground">ملخص شامل للإيرادات والمصروفات السنوية</p>
           </div>
           <Link href="/budget/quarterly">
             <Button style={{ backgroundColor: '#2563eb' }} className="text-white">
@@ -141,12 +141,12 @@ export default function AnnualBudgetPage() {
 
         {/* Annual Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي الإيرادات السنوية</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي الإيرادات السنوية</p>
                 <p className="text-2xl font-bold text-green-600">{totalRevenues.toLocaleString()} ر.س</p>
-                <p className="text-xs text-gray-500 mt-1">{revenues.length} عملية</p>
+                <p className="text-xs text-muted-foreground mt-1">{revenues.length} عملية</p>
               </div>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-100">
                 <TrendingUp className="h-6 w-6 text-green-600" />
@@ -154,12 +154,12 @@ export default function AnnualBudgetPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي المصروفات السنوية</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي المصروفات السنوية</p>
                 <p className="text-2xl font-bold text-red-600">{totalExpenses.toLocaleString()} ر.س</p>
-                <p className="text-xs text-gray-500 mt-1">{expenses.length} عملية</p>
+                <p className="text-xs text-muted-foreground mt-1">{expenses.length} عملية</p>
               </div>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-red-100">
                 <TrendingDown className="h-6 w-6 text-red-600" />
@@ -167,14 +167,14 @@ export default function AnnualBudgetPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">الصافي السنوي</p>
+                <p className="text-sm text-muted-foreground mb-1">الصافي السنوي</p>
                 <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
                   {netBalance.toLocaleString()} ر.س
                 </p>
-                <p className="text-xs text-gray-500 mt-1">{netBalance >= 0 ? 'فائض' : 'عجز'}</p>
+                <p className="text-xs text-muted-foreground mt-1">{netBalance >= 0 ? 'فائض' : 'عجز'}</p>
               </div>
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${netBalance >= 0 ? 'bg-blue-100' : 'bg-red-100'}`}>
                 <DollarSign className={`h-6 w-6 ${netBalance >= 0 ? 'text-blue-600' : 'text-red-600'}`} />
@@ -182,24 +182,24 @@ export default function AnnualBudgetPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl bg-white border border-gray-200">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">متوسط الإيرادات الربعية</p>
-                <p className="text-2xl font-bold text-gray-900">{avgQuarterlyRevenues.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground mb-1">متوسط الإيرادات الربعية</p>
+                <p className="text-2xl font-bold text-foreground">{avgQuarterlyRevenues.toLocaleString()} ر.س</p>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-600 mb-1">متوسط المصروفات الربعية</p>
-              <p className="text-lg font-bold text-gray-900">{avgQuarterlyExpenses.toLocaleString()} ر.س</p>
+              <p className="text-sm text-muted-foreground mb-1">متوسط المصروفات الربعية</p>
+              <p className="text-lg font-bold text-foreground">{avgQuarterlyExpenses.toLocaleString()} ر.س</p>
             </div>
           </div>
         </div>
 
         {/* Quarterly Comparison */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <div className="bg-card rounded-xl border border-border p-6 mb-8">
           <h2 className="text-xl font-bold mb-6">مقارنة الأرباع - {selectedYear}</h2>
-          <p className="text-gray-600 mb-6">تفصيل الإيرادات والمصروفات لكل ربع</p>
+          <p className="text-muted-foreground mb-6">تفصيل الإيرادات والمصروفات لكل ربع</p>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -215,7 +215,7 @@ export default function AnnualBudgetPage() {
                 {quarters.map((quarter) => {
                   const data = getQuarterData(quarter.id);
                   return (
-                    <tr key={quarter.id} className="border-b hover:bg-gray-50">
+                    <tr key={quarter.id} className="border-b hover:bg-accent">
                       <td className="py-3 px-4 font-semibold">{quarter.name}</td>
                       <td className="py-3 px-4 text-green-600">{data.totalRevenues.toLocaleString()} ر.س</td>
                       <td className="py-3 px-4 text-red-600">{data.totalExpenses.toLocaleString()} ر.س</td>
@@ -226,7 +226,7 @@ export default function AnnualBudgetPage() {
                     </tr>
                   );
                 })}
-                <tr className="bg-gray-50 font-bold">
+                <tr className="bg-accent font-bold">
                   <td className="py-3 px-4">الإجمالي السنوي</td>
                   <td className="py-3 px-4 text-green-600">{totalRevenues.toLocaleString()} ر.س</td>
                   <td className="py-3 px-4 text-red-600">{totalExpenses.toLocaleString()} ر.س</td>
@@ -241,9 +241,9 @@ export default function AnnualBudgetPage() {
         </div>
 
         {/* Expenses by Type */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h2 className="text-xl font-bold mb-6">توزيع المصروفات حسب النوع</h2>
-          <p className="text-gray-600 mb-6">تفصيل المصروفات السنوية حسب الفئة</p>
+          <p className="text-muted-foreground mb-6">تفصيل المصروفات السنوية حسب الفئة</p>
           <div className="space-y-4">
             {Object.entries(expensesByType).map(([type, amount]) => {
               const percentage = ((amount / totalExpenses) * 100).toFixed(1);
@@ -251,7 +251,7 @@ export default function AnnualBudgetPage() {
                 <div key={type}>
                   <div className="flex justify-between mb-2">
                     <span className="font-semibold">{typeLabels[type]}</span>
-                    <span className="text-gray-600">{amount.toLocaleString()} ر.س ({percentage}%)</span>
+                    <span className="text-muted-foreground">{amount.toLocaleString()} ر.س ({percentage}%)</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div

@@ -15,11 +15,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
   return (
     <nav 
-      className="fixed top-0 left-0 right-0 z-50 h-16 shadow-sm"
-      style={{ 
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #f0f0ef'
-      }}
+      className="fixed top-0 left-0 right-0 z-50 h-16 bg-card border-b border-border shadow-sm transition-colors"
     >
       <div className="flex items-center justify-between h-full px-4 lg:px-6 max-w-[1920px] mx-auto">
         {/* Right Side - Logo & Menu */}
@@ -28,26 +24,22 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            className="lg:hidden hover:bg-gray-50"
+            className="lg:hidden"
           >
-            <Menu className="h-5 w-5 text-gray-700" />
+            <Menu className="h-5 w-5" />
           </Button>
           
           <Link href="/" className="flex items-center gap-3">
             <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ 
-                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)'
-              }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary shadow-md"
             >
-              <span className="text-white font-bold text-xl">س</span>
+              <span className="text-primary-foreground font-bold text-xl">س</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-gray-900">
+              <h1 className="text-lg font-bold text-foreground">
                 نظام الرواتب
               </h1>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 صحيفة سبق
               </p>
             </div>
@@ -68,11 +60,11 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           <NavLink href="/payroll" active={pathname === "/payroll"}>
             الرواتب
           </NavLink>
-          <NavLink href="/budget" active={pathname === "/budget"}>
+          <NavLink href="/budget" active={pathname === "/budget" || pathname.startsWith("/budget/")}>
             الميزانية
           </NavLink>
-          <NavLink href="/reports" active={pathname === "/reports"}>
-            التقارير
+          <NavLink href="/reminders" active={pathname === "/reminders"}>
+            التذكيرات
           </NavLink>
         </div>
 
@@ -83,22 +75,21 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative hover:bg-gray-50"
+            className="relative"
           >
-            <Bell className="h-5 w-5 text-gray-700" />
+            <Bell className="h-5 w-5" />
             <span 
-              className="absolute top-1 right-1 w-2 h-2 rounded-full"
-              style={{ backgroundColor: '#ef4444' }}
+              className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"
             ></span>
           </Button>
           
-          <Button variant="ghost" size="icon" className="hover:bg-gray-50">
-            <User className="h-5 w-5 text-gray-700" />
+          <Button variant="ghost" size="icon">
+            <User className="h-5 w-5" />
           </Button>
 
-          <Button variant="ghost" size="icon" asChild className="hover:bg-gray-50">
+          <Button variant="ghost" size="icon" asChild>
             <Link href="/login">
-              <LogOut className="h-5 w-5 text-gray-700" />
+              <LogOut className="h-5 w-5" />
             </Link>
           </Button>
         </div>
@@ -114,13 +105,10 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
       className={`
         px-4 py-2 rounded-lg text-sm font-medium transition-all
         ${active 
-          ? 'text-blue-600' 
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          ? 'text-primary bg-primary/10' 
+          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
         }
       `}
-      style={active ? { 
-        backgroundColor: '#eff6ff',
-      } : undefined}
     >
       {children}
     </Link>

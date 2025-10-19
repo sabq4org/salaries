@@ -199,8 +199,8 @@ export default function LeaveSettlementPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">تصفية إجازة</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">تصفية إجازة</h1>
+            <p className="text-muted-foreground mt-1">
               حساب واستحقاق إجازات الموظفين مع التفاصيل الكاملة
             </p>
           </div>
@@ -219,7 +219,7 @@ export default function LeaveSettlementPage() {
                 <DialogTitle className="text-2xl">
                   إضافة تصفية إجازة جديدة
                 </DialogTitle>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   أدخل بيانات الموظف والإجازة لحساب الاستحقاق
                 </p>
               </DialogHeader>
@@ -462,43 +462,43 @@ export default function LeaveSettlementPage() {
                 {/* Results */}
                 {result && (
                   <div className="mt-6 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <h3 className="text-xl font-bold text-foreground mb-4 flex items-center">
                       <FileText className="w-5 h-5 ml-2 text-green-600" />
                       نتيجة الحساب
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">أيام الخدمة</p>
-                        <p className="text-2xl font-bold text-gray-900">
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">أيام الخدمة</p>
+                        <p className="text-2xl font-bold text-foreground">
                           {result.serviceDays}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">الأيام المستحقة</p>
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">الأيام المستحقة</p>
                         <p className="text-2xl font-bold text-blue-600">
                           {result.accruedDays}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">الرصيد قبل الخصم</p>
-                        <p className="text-2xl font-bold text-gray-900">
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">الرصيد قبل الخصم</p>
+                        <p className="text-2xl font-bold text-foreground">
                           {result.balanceBeforeDeduction}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">أيام الإجازة الحالية</p>
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">أيام الإجازة الحالية</p>
                         <p className="text-2xl font-bold text-orange-600">
                           {result.currentLeaveDays}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">الرصيد بعد الخصم</p>
-                        <p className="text-2xl font-bold text-gray-900">
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">الرصيد بعد الخصم</p>
+                        <p className="text-2xl font-bold text-foreground">
                           {result.balanceAfterDeduction}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded-lg shadow-sm">
-                        <p className="text-sm text-gray-600">عدد التذاكر</p>
+                      <div className="bg-card p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-muted-foreground">عدد التذاكر</p>
                         <p className="text-2xl font-bold text-purple-600">
                           {result.ticketsCount}
                         </p>
@@ -571,12 +571,12 @@ export default function LeaveSettlementPage() {
         </div>
 
         {/* Settlements Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">
+        <div className="bg-card rounded-xl shadow-sm border border-border">
+          <div className="p-6 border-b border-border">
+            <h2 className="text-xl font-bold text-foreground">
               التصفيات السابقة
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               جميع تصفيات الإجازات المسجلة
             </p>
           </div>
@@ -585,19 +585,19 @@ export default function LeaveSettlementPage() {
             {loading ? (
               <div className="p-12 text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">جاري التحميل...</p>
+                <p className="text-muted-foreground mt-4">جاري التحميل...</p>
               </div>
             ) : settlements.length === 0 ? (
               <div className="p-12 text-center">
                 <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg">لا توجد تصفيات مسجلة</p>
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-muted-foreground text-lg">لا توجد تصفيات مسجلة</p>
+                <p className="text-muted-foreground text-sm mt-2">
                   ابدأ بإضافة تصفية إجازة جديدة
                 </p>
               </div>
             ) : (
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-accent">
                   <tr>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">
                       الاسم
@@ -626,20 +626,20 @@ export default function LeaveSettlementPage() {
                   {settlements.map((settlement) => (
                     <tr
                       key={settlement.id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-accent transition-colors"
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 text-sm font-medium text-foreground">
                         {settlement.employeeName}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
                         {settlement.employeePosition || "بدون منصب"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
                         {format(new Date(settlement.joinDate), "d MMM yyyy", {
                           locale: ar,
                         })}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
                         {format(
                           new Date(settlement.leaveStartDate),
                           "d MMM yyyy",

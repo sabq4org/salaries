@@ -165,7 +165,7 @@ export default function ContractorsPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#16a34a' }}></div>
-            <p className="text-gray-600">جاري تحميل البيانات...</p>
+            <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -177,10 +177,10 @@ export default function ContractorsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             المتعاونون
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             إدارة بيانات المتعاونين والرواتب
           </p>
         </div>
@@ -257,8 +257,8 @@ export default function ContractorsPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي المتعاونين</p>
-              <p className="text-3xl font-bold text-gray-900">{contractors.length}</p>
+              <p className="text-sm text-muted-foreground mb-1">إجمالي المتعاونين</p>
+              <p className="text-3xl font-bold text-foreground">{contractors.length}</p>
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -275,8 +275,8 @@ export default function ContractorsPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
+              <p className="text-3xl font-bold text-foreground">
                 {contractors.reduce((sum, c) => sum + c.salary, 0).toLocaleString()} ر.س
               </p>
             </div>
@@ -308,7 +308,7 @@ export default function ContractorsPage() {
               <tbody>
                 {contractors.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center p-8 text-gray-500">
+                    <td colSpan={5} className="text-center p-8 text-muted-foreground">
                       لا يوجد متعاونون
                     </td>
                   </tr>

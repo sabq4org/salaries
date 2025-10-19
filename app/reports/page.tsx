@@ -102,8 +102,8 @@ export default function ReportsPage() {
       <div className="p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">التقارير الشاملة</h1>
-          <p className="text-gray-600">ملخص شامل للموظفين والرواتب والمصروفات</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">التقارير الشاملة</h1>
+          <p className="text-muted-foreground">ملخص شامل للموظفين والرواتب والمصروفات</p>
         </div>
 
         {/* Main Stats */}
@@ -114,8 +114,8 @@ export default function ReportsPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي الموظفين</p>
-                <p className="text-3xl font-bold text-gray-900">{employees.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي الموظفين</p>
+                <p className="text-3xl font-bold text-foreground">{employees.length}</p>
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -132,8 +132,8 @@ export default function ReportsPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي المتعاونين</p>
-                <p className="text-3xl font-bold text-gray-900">{contractors.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي المتعاونين</p>
+                <p className="text-3xl font-bold text-foreground">{contractors.length}</p>
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -150,8 +150,8 @@ export default function ReportsPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
-                <p className="text-2xl font-bold text-gray-900">{totalPayroll.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
+                <p className="text-2xl font-bold text-foreground">{totalPayroll.toLocaleString()} ر.س</p>
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -168,8 +168,8 @@ export default function ReportsPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">إجمالي المصروفات</p>
-                <p className="text-2xl font-bold text-gray-900">{totalCost.toLocaleString()} ر.س</p>
+                <p className="text-sm text-muted-foreground mb-1">إجمالي المصروفات</p>
+                <p className="text-2xl font-bold text-foreground">{totalCost.toLocaleString()} ر.س</p>
               </div>
               <div 
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -186,7 +186,7 @@ export default function ReportsPage() {
           className="p-6 rounded-xl mb-8"
           style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
             ملخص الموظفين الرسميين
           </h2>
@@ -203,7 +203,7 @@ export default function ReportsPage() {
               <tbody>
                 {employees.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center p-8 text-gray-500">
+                    <td colSpan={4} className="text-center p-8 text-muted-foreground">
                       لا توجد بيانات
                     </td>
                   </tr>
@@ -215,20 +215,20 @@ export default function ReportsPage() {
                         borderTop: '1px solid #f0f0ef',
                         backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
                       }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-accent transition-colors"
                     >
-                      <td className="p-4 text-gray-900 font-medium">{emp.name}</td>
-                      <td className="p-4 text-gray-900">{emp.position || '-'}</td>
-                      <td className="p-4 text-gray-900">{emp.baseSalary.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">{emp.socialInsurance.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-foreground font-medium">{emp.name}</td>
+                      <td className="p-4 text-foreground">{emp.position || '-'}</td>
+                      <td className="p-4 text-foreground">{emp.baseSalary.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-foreground">{emp.socialInsurance.toLocaleString()} ر.س</td>
                     </tr>
                   ))
                 )}
                 {employees.length > 0 && (
                   <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
-                    <td colSpan={2} className="p-4 text-gray-900 font-bold">الإجمالي</td>
-                    <td className="p-4 text-gray-900 font-bold">{totalEmployeeSalaries.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900 font-bold">
+                    <td colSpan={2} className="p-4 text-foreground font-bold">الإجمالي</td>
+                    <td className="p-4 text-foreground font-bold">{totalEmployeeSalaries.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-foreground font-bold">
                       {employees.reduce((sum, e) => sum + e.socialInsurance, 0).toLocaleString()} ر.س
                     </td>
                   </tr>
@@ -243,7 +243,7 @@ export default function ReportsPage() {
           className="p-6 rounded-xl mb-8"
           style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
             ملخص المتعاونين
           </h2>
@@ -259,7 +259,7 @@ export default function ReportsPage() {
               <tbody>
                 {contractors.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="text-center p-8 text-gray-500">
+                    <td colSpan={3} className="text-center p-8 text-muted-foreground">
                       لا توجد بيانات
                     </td>
                   </tr>
@@ -271,18 +271,18 @@ export default function ReportsPage() {
                         borderTop: '1px solid #f0f0ef',
                         backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
                       }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-accent transition-colors"
                     >
-                      <td className="p-4 text-gray-900 font-medium">{con.name}</td>
-                      <td className="p-4 text-gray-900">{con.position || '-'}</td>
-                      <td className="p-4 text-gray-900">{con.salary.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-foreground font-medium">{con.name}</td>
+                      <td className="p-4 text-foreground">{con.position || '-'}</td>
+                      <td className="p-4 text-foreground">{con.salary.toLocaleString()} ر.س</td>
                     </tr>
                   ))
                 )}
                 {contractors.length > 0 && (
                   <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
-                    <td colSpan={2} className="p-4 text-gray-900 font-bold">الإجمالي</td>
-                    <td className="p-4 text-gray-900 font-bold">{totalContractorSalaries.toLocaleString()} ر.س</td>
+                    <td colSpan={2} className="p-4 text-foreground font-bold">الإجمالي</td>
+                    <td className="p-4 text-foreground font-bold">{totalContractorSalaries.toLocaleString()} ر.س</td>
                   </tr>
                 )}
               </tbody>
@@ -295,7 +295,7 @@ export default function ReportsPage() {
           className="p-6 rounded-xl"
           style={{ backgroundColor: '#ffffff', border: '1px solid #f0f0ef' }}
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center">
             <FileText className="ml-2" size={24} />
             ملخص المصروفات حسب النوع
           </h2>
@@ -311,7 +311,7 @@ export default function ReportsPage() {
               <tbody>
                 {Object.keys(expensesByType).length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="text-center p-8 text-gray-500">
+                    <td colSpan={3} className="text-center p-8 text-muted-foreground">
                       لا توجد مصروفات
                     </td>
                   </tr>
@@ -323,11 +323,11 @@ export default function ReportsPage() {
                         borderTop: '1px solid #f0f0ef',
                         backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
                       }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-accent transition-colors"
                     >
-                      <td className="p-4 text-gray-900 font-medium">{typeLabels[type] || type}</td>
-                      <td className="p-4 text-gray-900">{amount.toLocaleString()} ر.س</td>
-                      <td className="p-4 text-gray-900">
+                      <td className="p-4 text-foreground font-medium">{typeLabels[type] || type}</td>
+                      <td className="p-4 text-foreground">{amount.toLocaleString()} ر.س</td>
+                      <td className="p-4 text-foreground">
                         {totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : 0}%
                       </td>
                     </tr>
@@ -335,9 +335,9 @@ export default function ReportsPage() {
                 )}
                 {Object.keys(expensesByType).length > 0 && (
                   <tr style={{ borderTop: '2px solid #f0f0ef', backgroundColor: '#f8f8f7' }}>
-                    <td className="p-4 text-gray-900 font-bold">الإجمالي</td>
-                    <td className="p-4 text-gray-900 font-bold">{totalExpenses.toLocaleString()} ر.س</td>
-                    <td className="p-4 text-gray-900 font-bold">100%</td>
+                    <td className="p-4 text-foreground font-bold">الإجمالي</td>
+                    <td className="p-4 text-foreground font-bold">{totalExpenses.toLocaleString()} ر.س</td>
+                    <td className="p-4 text-foreground font-bold">100%</td>
                   </tr>
                 )}
               </tbody>

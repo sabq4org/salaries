@@ -39,16 +39,16 @@ export function SortableRow({ employee, index, onEdit, onDelete }: SortableRowPr
   };
 
   return (
-    <tr ref={setNodeRef} style={style} className="hover:bg-gray-50 transition-colors">
+    <tr ref={setNodeRef} style={style} className="hover:bg-accent transition-colors">
       <td className="p-4">
         <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
           <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
       </td>
-      <td className="p-4 text-gray-900 font-medium">{employee.name}</td>
-      <td className="p-4 text-gray-600">{employee.position || '-'}</td>
-      <td className="p-4 text-gray-900">{employee.baseSalary.toLocaleString()} ر.س</td>
-      <td className="p-4 text-gray-900">{employee.socialInsurance.toLocaleString()} ر.س</td>
+      <td className="p-4 text-foreground font-medium">{employee.name}</td>
+      <td className="p-4 text-muted-foreground">{employee.position || '-'}</td>
+      <td className="p-4 text-foreground">{employee.baseSalary.toLocaleString()} ر.س</td>
+      <td className="p-4 text-foreground">{employee.socialInsurance.toLocaleString()} ر.س</td>
       <td className="p-4">
         <div className="flex items-center justify-center gap-2">
           <Button

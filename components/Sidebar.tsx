@@ -9,9 +9,7 @@ import {
   DollarSign, 
   TrendingUp, 
   FileText,
-  Settings,
   Settings2,
-  HelpCircle,
   X,
   Calendar,
   Bell
@@ -56,19 +54,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         className={`
           fixed top-16 right-0 bottom-0 z-40 w-64
-          transform transition-transform duration-300 ease-in-out
+          bg-card border-l border-border
+          transform transition-all duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           lg:translate-x-0
         `}
-        style={{
-          backgroundColor: '#ffffff',
-          borderLeft: '1px solid #f0f0ef'
-        }}
       >
         <div className="flex flex-col h-full">
           {/* Close button for mobile */}
           <div className="flex justify-between items-center p-4 lg:hidden">
-            <h2 className="font-semibold text-gray-900">القائمة</h2>
+            <h2 className="font-semibold text-foreground">القائمة</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-5 w-5" />
             </Button>
@@ -76,7 +71,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Main Menu */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               القائمة الرئيسية
             </p>
             {menuItems.map((item) => (
@@ -84,7 +79,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 icon={item.icon}
-                active={pathname === item.href}
+                active={pathname === item.href || (item.href === "/budget" && pathname.startsWith("/budget/"))}
                 onClick={onClose}
               >
                 {item.label}
@@ -95,8 +90,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Bottom Menu - Hidden for now */}
           {bottomMenuItems.length > 0 && (
             <div 
-              className="px-3 py-4 space-y-1"
-              style={{ borderTop: '1px solid #f0f0ef' }}
+              className="px-3 py-4 space-y-1 border-t border-border"
             >
               {bottomMenuItems.map((item) => (
                 <SidebarLink
@@ -114,23 +108,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* User Info */}
           <div 
-            className="p-4"
-            style={{ borderTop: '1px solid #f0f0ef' }}
+            className="p-4 border-t border-border"
           >
             <div className="flex items-center gap-3">
               <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ 
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'
-                }}
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-primary"
               >
-                <span className="text-white font-semibold">A</span>
+                <span className="text-primary-foreground font-semibold">A</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   المسؤول
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   admin@sabq.com
                 </p>
               </div>
@@ -159,13 +149,10 @@ function SidebarLink({ href, icon: Icon, active, children, onClick }: SidebarLin
         flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
         transition-all duration-200
         ${active
-          ? 'text-blue-600'
-          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+          ? 'text-primary bg-primary/10'
+          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
         }
       `}
-      style={active ? {
-        backgroundColor: '#eff6ff',
-      } : undefined}
     >
       <Icon className="h-5 w-5 flex-shrink-0" />
       <span>{children}</span>

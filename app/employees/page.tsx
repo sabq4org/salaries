@@ -171,7 +171,7 @@ export default function EmployeesPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#2563eb' }}></div>
-            <p className="text-gray-600">جاري تحميل البيانات...</p>
+            <p className="text-muted-foreground">جاري تحميل البيانات...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -183,10 +183,10 @@ export default function EmployeesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             الموظفون الرسميون
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             إدارة بيانات الموظفين والرواتب والتأمينات الاجتماعية
           </p>
         </div>
@@ -286,8 +286,8 @@ export default function EmployeesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي الموظفين</p>
-              <p className="text-3xl font-bold text-gray-900">{employees.length}</p>
+              <p className="text-sm text-muted-foreground mb-1">إجمالي الموظفين</p>
+              <p className="text-3xl font-bold text-foreground">{employees.length}</p>
             </div>
             <div 
               className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -304,8 +304,8 @@ export default function EmployeesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي الرواتب</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm text-muted-foreground mb-1">إجمالي الرواتب</p>
+              <p className="text-3xl font-bold text-foreground">
                 {employees.reduce((sum, e) => sum + e.baseSalary, 0).toLocaleString()} ر.س
               </p>
             </div>
@@ -318,8 +318,8 @@ export default function EmployeesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">إجمالي التأمينات</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm text-muted-foreground mb-1">إجمالي التأمينات</p>
+              <p className="text-3xl font-bold text-foreground">
                 {employees.reduce((sum, e) => sum + e.socialInsurance, 0).toLocaleString()} ر.س
               </p>
             </div>
@@ -352,7 +352,7 @@ export default function EmployeesPage() {
               <tbody>
                 {employees.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center p-8 text-gray-500">
+                    <td colSpan={6} className="text-center p-8 text-muted-foreground">
                       لا يوجد موظفون
                     </td>
                   </tr>
