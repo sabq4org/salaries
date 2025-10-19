@@ -9,6 +9,7 @@ interface Employee {
   position: string | null;
   baseSalary: number;
   socialInsurance: number;
+  leaveBalance: number;
   sortOrder: number;
   isActive: boolean;
 }
@@ -45,7 +46,14 @@ export function SortableRow({ employee, index, onEdit, onDelete }: SortableRowPr
           <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
       </td>
-      <td className="p-4 text-foreground font-medium">{employee.name}</td>
+      <td className="p-4">
+        <div className="flex flex-col">
+          <span className="text-foreground font-medium">{employee.name}</span>
+          <span className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full w-fit mt-1">
+            {employee.leaveBalance} يوم إجازة
+          </span>
+        </div>
+      </td>
       <td className="p-4 text-muted-foreground">{employee.position || '-'}</td>
       <td className="p-4 text-foreground">{employee.baseSalary.toLocaleString()} ر.س</td>
       <td className="p-4 text-foreground">{employee.socialInsurance.toLocaleString()} ر.س</td>
