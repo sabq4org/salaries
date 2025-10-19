@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash2, DollarSign, Calendar, Users, UserCheck, Shield, FileDown, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
-import { exportPayrollToPDF } from "@/lib/exportPDF";
+// import { exportPayrollToPDF } from "@/lib/exportPDF"; // Replaced with API endpoint
 import { exportPayrollToExcel } from "@/lib/exportExcel";
 
 interface EmployeePayroll {
@@ -225,8 +225,10 @@ export default function PayrollPage() {
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     try {
+      toast.info('جاري إنشاء ملف PDF...');
+      
       const data = {
         employeePayrolls,
         contractorPayrolls,
@@ -237,7 +239,29 @@ export default function PayrollPage() {
         totalSocialInsurance,
         grandTotal,
       };
-      exportPayrollToPDF(data);
+      
+      const response = await fetch('/api/payroll/export-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `payroll_${selectedYear}_${selectedMonth}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
       toast.success('تم تصدير المسير إلى PDF بنجاح');
     } catch (error) {
       console.error('Error exporting PDF:', error);
