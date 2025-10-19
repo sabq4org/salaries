@@ -620,6 +620,7 @@ export default function QuarterlyBudgetPage() {
                       <th className="text-right py-3 px-4">الفئة</th>
                       <th className="text-right py-3 px-4">الوصف</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
+                      <th className="text-center py-3 px-4">المرفق</th>
                       <th className="text-right py-3 px-4">الإجراءات</th>
                     </tr>
                   </thead>
@@ -630,6 +631,23 @@ export default function QuarterlyBudgetPage() {
                         <td className="py-3 px-4">{getCategoryDisplay(expense.type)}</td>
                         <td className="py-3 px-4">{expense.description || '-'}</td>
                         <td className="py-3 px-4 font-semibold">{expense.amount.toLocaleString()} ر.س</td>
+                        <td className="py-3 px-4 text-center">
+                          {expense.attachmentUrl ? (
+                            <a
+                              href={expense.attachmentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
+                              title="عرض المرفق"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 dark:text-blue-400">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                              </svg>
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
                             <Button
@@ -668,6 +686,7 @@ export default function QuarterlyBudgetPage() {
                       <th className="text-right py-3 px-4">المصدر</th>
                       <th className="text-right py-3 px-4">المبلغ</th>
                       <th className="text-right py-3 px-4">الملاحظات</th>
+                      <th className="text-center py-3 px-4">المرفق</th>
                       <th className="text-right py-3 px-4">الإجراءات</th>
                     </tr>
                   </thead>
@@ -678,6 +697,23 @@ export default function QuarterlyBudgetPage() {
                         <td className="py-3 px-4">{revenue.source}</td>
                         <td className="py-3 px-4 font-semibold">{revenue.amount.toLocaleString()} ر.س</td>
                         <td className="py-3 px-4">{revenue.notes || '-'}</td>
+                        <td className="py-3 px-4 text-center">
+                          {revenue.attachmentUrl ? (
+                            <a
+                              href={revenue.attachmentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 transition-colors"
+                              title="عرض المرفق"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 dark:text-green-400">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                              </svg>
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
                             <Button
