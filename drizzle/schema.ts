@@ -103,7 +103,7 @@ export const expenses = pgTable("expenses", {
   year: integer("year").notNull(),
   month: integer("month").notNull(),
   quarter: integer("quarter").notNull(), // 1, 2, 3, 4
-  type: expenseTypeEnum("type").notNull(),
+  type: text("type").notNull(),
   description: text("description"),
   amount: integer("amount").notNull().default(0),
   date: timestamp("date").notNull().defaultNow(),
